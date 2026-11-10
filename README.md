@@ -7,12 +7,12 @@ all within mouse reach and tucked away when idle.
 
 <br>
 
-[Overview](#-overview) ·
-[What's Inside](#-whats-inside) ·
-[Install](#-installation) ·
-[Keybindings](#-window-manager-keybindings) ·
-[Configuration](#-configuration) ·
-[Testing](#-testing)
+[Overview](#overview) ·
+[What's Inside](#whats-inside) ·
+[Install](#installation) ·
+[Keybindings](#window-manager-keybindings) ·
+[Configuration](#configuration) ·
+[Testing](#testing)
 
 <br>
 
@@ -20,7 +20,7 @@ all within mouse reach and tucked away when idle.
 
 <br>
 
-## ✦ Overview
+## Overview
 
 The idea behind this configuration is straightforward: keep daily essentials within mouse reach, without opening a browser tab or spawning separate desktop utility windows.
 
@@ -28,9 +28,9 @@ The interface stays **consistent**, **fluid**, and **tucked away when idle**. Ev
 
 | | | |
 | :--- | :--- | :--- |
-| 📅 Calendar | 🌤️ Weather | 📊 Hardware monitoring |
-| 🔊 Audio devices | 📝 Notes | 📡 Connectivity |
-| 🔋 Power actions | 🔔 Notifications | 🔒 Screen locking |
+| Calendar | Weather | Hardware monitoring |
+| Audio devices | Notes | Connectivity |
+| Power actions | Notifications | Screen locking |
 
 <br>
 
@@ -38,13 +38,13 @@ The interface stays **consistent**, **fluid**, and **tucked away when idle**. Ev
 
 <br>
 
-## ✦ What's Inside
+## What's Inside
 
 The shell organizes its controls around the perimeter of the screen.
 
 <br>
 
-### 🔝 Top Bar
+### Top Bar
 
 | Section | Description |
 | :--- | :--- |
@@ -54,7 +54,7 @@ The shell organizes its controls around the perimeter of the screen.
 
 <br>
 
-### ◀️ Left Bar & Circles
+### Left Bar & Circles
 
 **Workspace Island**
 
@@ -66,9 +66,9 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 | Control | Powered by | Features |
 | :--- | :--- | :--- |
-| 📶 **Wi-Fi** | `nmcli` | Network scanner, signal strength, connection status, password prompts |
-| 🔷 **Bluetooth** | `bluetoothctl` | Device discovery, pairing, battery indicators, connect/disconnect toggles |
-| 🌙 **Night Light** | `wlsunset` | Gamma temperature controls, toggle, coordinate adjustments |
+| **Wi-Fi** | `nmcli` | Network scanner, signal strength, connection status, password prompts |
+| **Bluetooth** | `bluetoothctl` | Device discovery, pairing, battery indicators, connect/disconnect toggles |
+| **Night Light** | `wlsunset` | Gamma temperature controls, toggle, coordinate adjustments |
 
 <br>
 
@@ -76,9 +76,9 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 | Control | Powered by | Features |
 | :--- | :--- | :--- |
-| ⚡ **Power Profiles** | `powerprofilesctl` | Quick toggle between Performance, Balanced, and Power Saver |
-| 🔋 **Battery Diagnostics** | `UPower` | Real-time percentage, time to empty/full, health, cycle count |
-| ⏻ **Session Actions** | n/a | Quick triggers for Reboot, Power Off, Sleep, and Lock |
+| **Power Profiles** | `powerprofilesctl` | Quick toggle between Performance, Balanced, and Power Saver |
+| **Battery Diagnostics** | `UPower` | Real-time percentage, time to empty/full, health, cycle count |
+| **Session Actions** | n/a | Quick triggers for Reboot, Power Off, Sleep, and Lock |
 
 <br>
 
@@ -86,13 +86,13 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 | Feature | Powered by | Features |
 | :--- | :--- | :--- |
-| 🔍 **App Launcher** | n/a | Application search |
-| 📋 **Clipboard** | `cliphist` | Clipboard history |
-| 🧰 **Utilities** | `grim` · `slurp` · `satty` · `hyprpicker` | Screenshots and color picker |
+| **App Launcher** | n/a | Application search |
+| **Clipboard** | `cliphist` | Clipboard history |
+| **Utilities** | `grim` · `slurp` · `satty` · `hyprpicker` | Screenshots and color picker |
 
 <br>
 
-### 🔽 Bottom Bars
+### Bottom Bars
 
 | Section | Description |
 | :--- | :--- |
@@ -101,7 +101,7 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 <br>
 
-### ▶️ Right Edge
+### Right Edge
 
 **Stick Notes**
 
@@ -109,7 +109,7 @@ A perimeter drawer for quick scratchpad notes with swipe gestures, saved locally
 
 <br>
 
-### 🪟 Window Management & Locker
+### Window Management & Locker
 
 | Feature | Description |
 | :--- | :--- |
@@ -122,7 +122,7 @@ A perimeter drawer for quick scratchpad notes with swipe gestures, saved locally
 
 <br>
 
-## ✦ Requirements
+## Requirements
 
 Targeted at **Arch Linux**. Runtime system packages are listed in [`requirements.txt`](./requirements.txt):
 
@@ -136,7 +136,7 @@ grep -vE '^\s*(#|$)' requirements.txt | sudo pacman -S --needed -
 
 <br>
 
-## ✦ Installation
+## Installation
 
 **Run directly from the repo** inside an active Wayland session:
 
@@ -157,7 +157,7 @@ qs
 
 <br>
 
-## ✦ Window Manager Keybindings
+## Window Manager Keybindings
 
 The shell exposes IPC handlers for window manager shortcuts or custom scripts.
 
@@ -188,7 +188,7 @@ qs ipc call lock lock
 
 <br>
 
-## ✦ Configuration
+## Configuration
 
 Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**.
 
@@ -209,7 +209,7 @@ Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**
 
 <br>
 
-## ✦ Testing
+## Testing
 
 Headless automated pipeline checks: Python tests, config schemas, QML component tests, and linters.
 
