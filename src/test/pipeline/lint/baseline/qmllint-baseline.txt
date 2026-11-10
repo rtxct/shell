@@ -1,0 +1,23 @@
+# Justified pre-existing qmllint warnings baseline
+# Each entry below is a regex pattern preceded by a one-line explanation.
+
+# 1. Quickshell C++ module types (PanelWindow, Process, Loader QObject dynamic items, ScreenInfo) lack static QML typeinfo outside the quickshell runtime:
+\[uncreatable-type\]
+\[signal-handler-parameters\]
+\[missing-property\]
+\[incompatible-type\]
+
+# 2. Omission of `pragma ComponentBehavior: Bound` is intentional (see AGENTS.md §9.2) to maintain compatibility with both Qt5 and Qt6 qmllint and preserve Repeater/ListView/Variants delegate outer-scope lookups:
+\[unqualified\]
+
+# 3. Pre-existing width/height bindings alongside Layout properties in NotificationCenterBar:
+notification-center-bar\.module\.qml:.*\[Quick\.layout-positioning\]
+
+# 4. Dotted filenames (*.style.qml) mapped to PascalCase types in qmldir when passed directly on CLI to qmllint:
+Type .* not declared as singleton in qmldir but using pragma Singleton
+
+# 5. QML property names matching outer/sibling ID names:
+\[id-shadows-member\]
+
+# 6. JavaScript block-scoped var declarations:
+var declaration in block scope is hoisted to function scope

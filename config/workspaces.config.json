@@ -1,0 +1,5 @@
+{
+  "backend": "sway",
+  "count": 10,
+  "pollIntervalMs": 1000
+}

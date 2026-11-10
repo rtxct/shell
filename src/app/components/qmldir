@@ -1,0 +1,13 @@
+Drop 1.0 drop.component.qml
+Strip 1.0 strip.component.qml
+Island 1.0 island.component.qml
+SideBar 1.0 side-bar.component.qml
+Circle 1.0 circle.component.qml
+MonthGrid 1.0 month-grid.component.qml
+EventsList 1.0 events-list.component.qml
+LocationPicker 1.0 location-picker.component.qml
+WeatherCard 1.0 weather-card.component.qml
+WeatherView 1.0 weather-view.component.qml
+PanelPlaceholder 1.0 panel-placeholder.component.qml
+NotificationCard 1.0 notification-card.component.qml
+FloatingWindow 1.0 floating-window.component.qml

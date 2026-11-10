@@ -1,0 +1,10 @@
+# Justified baseline of tolerated runtime warnings during manual Quickshell smoke runs
+# Each entry below is an extended regex pattern preceded by a one-line explanation.
+
+# 1. Third-party .desktop entries installed on the host system referencing theme icons missing from the active icon theme:
+WARN: Could not load icon ".*" at size QSize\(.*\) from request
+WARN scene: QML IconImage at @modules/app-menu\.module\.qml.*Cannot open: image://qsimage/
+WARN scene: QML IconImage at @modules/floating-app-menu-panel\.module\.qml.*Cannot open: image://qsimage/
+
+# 2. If another Quickshell instance or notification daemon already holds org.freedesktop.Notifications during an existing session smoke run:
+WARN.*NotificationServer.*

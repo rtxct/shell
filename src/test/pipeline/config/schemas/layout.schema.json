@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LayoutConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "windowGap",
+    "barMaxWidth",
+    "screenMargin",
+    "leftBarMaxLength",
+    "launcherX",
+    "bottomGap",
+    "rightGap"
+  ],
+  "properties": {
+    "windowGap": {
+      "type": "number",
+      "minimum": 0
+    },
+    "barMaxWidth": {
+      "type": "number",
+      "minimum": 100
+    },
+    "screenMargin": {
+      "type": "number",
+      "minimum": 0
+    },
+    "leftBarMaxLength": {
+      "type": "number",
+      "minimum": 100
+    },
+    "launcherX": {
+      "type": "number",
+      "minimum": 0
+    },
+    "bottomGap": {
+      "type": "number",
+      "minimum": 0
+    },
+    "rightGap": {
+      "type": "number",
+      "minimum": 0
+    }
+  }
+}

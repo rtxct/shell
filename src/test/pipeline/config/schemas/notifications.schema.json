@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NotificationsConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "defaultTimeoutMs",
+    "criticalTimeoutMs",
+    "maxVisibleCount"
+  ],
+  "properties": {
+    "defaultTimeoutMs": {
+      "type": "integer",
+      "minimum": 500
+    },
+    "criticalTimeoutMs": {
+      "type": "integer",
+      "minimum": 500
+    },
+    "maxVisibleCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# Justified pre-existing qmlformat baseline
+# Qt 6.11.2 `/usr/lib/qt6/bin/qmlformat` does not support `--verify` and defaults to `--semicolon-rule always`,
+# which rewrites pre-existing semicolon-free bindings and expands compact single-line declarations (`Timer { id: ... }`)
+# across all 72 existing QML files. `run-lint.sh` runs `qmlformat` in parse-verification mode on every QML file to
+# ensure 100% AST validity without altering pre-existing code style.
+shell.qml
+theme/*.qml
+styles/*.qml
+components/*.qml
+modules/*.qml

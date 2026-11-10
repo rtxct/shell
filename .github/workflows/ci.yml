@@ -1,0 +1,61 @@
+name: Pipeline CI
+
+on:
+  push:
+    branches: ["master", "main", "**"]
+  pull_request:
+
+jobs:
+  lint:
+    name: Static Checks (qmllint, qmlformat, ruff, shellcheck)
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install Arch Linux dependencies
+        run: |
+          pacman -Syu --noconfirm git make python python-pytest python-pytest-cov python-jsonschema ruff shellcheck qt6-base qt6-declarative quickshell
+      - uses: actions/checkout@v4
+      - name: Run static linters
+        run: make lint
+
+  python:
+    name: Python & Shell Script Tests
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install Arch Linux dependencies
+        run: |
+          pacman -Syu --noconfirm git make python python-pytest python-pytest-cov python-jsonschema
+      - uses: actions/checkout@v4
+      - name: Run Python & script unit tests
+        run: make test-python
+
+  config:
+    name: Config JSON Schema Validation
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install Arch Linux dependencies
+        run: |
+          pacman -Syu --noconfirm git make python python-pytest python-pytest-cov python-jsonschema
+      - uses: actions/checkout@v4
+      - name: Run config schema tests
+        run: make test-config
+
+  qml:
+    name: Headless QML Component & Theme Tests
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - name: Install Arch Linux dependencies
+        run: |
+          pacman -Syu --noconfirm git make python python-pytest qt6-base qt6-declarative qt6-shadertools ttf-nerd-fonts-symbols quickshell
+      - uses: actions/checkout@v4
+      - name: Run headless QML tests
+        run: make test-qml

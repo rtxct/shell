@@ -1,0 +1,46 @@
+# ============================================================================
+# Quickshell — Runtime System Packages (Arch Linux)
+# ============================================================================
+
+# Core Shell & Qt6 Runtime
+quickshell
+qt6-base
+qt6-declarative
+qt6-shadertools
+
+# Audio & Media Subsystem (Volume, Mic, PAVUControl & Spectrum Visualizer)
+pipewire
+pipewire-pulse
+wireplumber
+libpulse
+playerctl
+cava
+
+# Connectivity & Hardware Controls (Wi-Fi, Bluetooth, Power Profiles, Night Light)
+networkmanager
+bluez
+bluez-utils
+power-profiles-daemon
+wlsunset
+pciutils
+
+# Clipboard, Screenshot, Color Picker & Wallpaper / Screen Locker
+cliphist
+wl-clipboard
+grim
+slurp
+satty
+hyprpicker
+awww
+
+# Python Runtime & D-Bus / GI Bindings (Bluetooth, Stick Notes, App Menu, System)
+python
+python-dbus
+python-gobject
+
+# Network & Utilities
+curl
+
+# Typography & Icons
+ttf-jetbrains-mono-nerd
+ttf-nerd-fonts-symbols

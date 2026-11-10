@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudioConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pollIntervalMs",
+    "maxVolume",
+    "wheelStep",
+    "activePeakThreshold"
+  ],
+  "properties": {
+    "pollIntervalMs": {
+      "type": "integer",
+      "minimum": 100
+    },
+    "maxVolume": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "maximum": 3.0
+    },
+    "wheelStep": {
+      "type": "number",
+      "exclusiveMinimum": 0.0,
+      "maximum": 1.0
+    },
+    "activePeakThreshold": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "spectrumEnabled": {
+      "type": "boolean"
+    },
+    "spectrumBars": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 64
+    },
+    "spectrumFramerate": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 144
+    },
+    "spectrumNoiseReduction": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    }
+  }
+}

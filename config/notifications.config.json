@@ -1,0 +1,5 @@
+{
+  "defaultTimeoutMs": 5000,
+  "criticalTimeoutMs": 8000,
+  "maxVisibleCount": 4
+}

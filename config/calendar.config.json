@@ -1,0 +1,9 @@
+{
+  "icsUrl": "",
+  "refreshMinutes": 10,
+  "listDays": 30,
+  "windowStartDays": -40,
+  "windowEndDays": 90,
+  "maxUpcoming": 60,
+  "curlMaxTimeSeconds": 20
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CalendarConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "icsUrl",
+    "refreshMinutes",
+    "listDays",
+    "windowStartDays",
+    "windowEndDays",
+    "maxUpcoming",
+    "curlMaxTimeSeconds"
+  ],
+  "properties": {
+    "icsUrl": {
+      "type": "string"
+    },
+    "refreshMinutes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "listDays": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "windowStartDays": {
+      "type": "integer",
+      "maximum": 0
+    },
+    "windowEndDays": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "maxUpcoming": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "curlMaxTimeSeconds": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

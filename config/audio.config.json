@@ -1,0 +1,10 @@
+{
+  "pollIntervalMs": 1000,
+  "maxVolume": 1.5,
+  "wheelStep": 0.03,
+  "activePeakThreshold": 0.005,
+  "spectrumEnabled": true,
+  "spectrumBars": 20,
+  "spectrumFramerate": 60,
+  "spectrumNoiseReduction": 45
+}
