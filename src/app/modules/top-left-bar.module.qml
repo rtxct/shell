@@ -492,17 +492,24 @@ SideBar {
                 anchors.topMargin: 3
                 anchors.bottomMargin: 3
                 clip: true
-                interactive: bar.isFloatingWindow
+                interactive: true
                 boundsBehavior: Flickable.StopAtBounds
                 model: procListModel
                 spacing: 1
 
                 WheelHandler {
+                    acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
                     onWheel: function(event) {
-                        var delta = (event.angleDelta.y / 120.0) * 52
-                        var maxY = Math.max(0, procListView.contentHeight - procListView.height)
-                        procListView.contentY = Math.max(0, Math.min(maxY, procListView.contentY - delta))
-                        event.accepted = true
+                        var dy = 0
+                        if (event.angleDelta && event.angleDelta.y !== 0) {
+                            dy = (event.angleDelta.y / 120.0) * 52
+                        } else if (event.pixelDelta && event.pixelDelta.y !== 0) {
+                            dy = event.pixelDelta.y
+                        }
+                        if (dy !== 0) {
+                            var maxY = Math.max(0, procListView.contentHeight - procListView.height)
+                            procListView.contentY = Math.max(0, Math.min(maxY, procListView.contentY - dy))
+                        }
                     }
                 }
 

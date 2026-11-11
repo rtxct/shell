@@ -659,15 +659,22 @@ SideBar {
                             contentHeight: cpuCoresGrid.height + 2 * cpuCoresSection.hoverBleed
                             clip: true
                             boundsBehavior: Flickable.StopAtBounds
-                            interactive: bar.isFloatingWindow && cpuCoresSection.isScrollable
+                            interactive: cpuCoresSection.isScrollable
 
                             WheelHandler {
+                                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
                                 enabled: cpuCoresSection.isScrollable
                                 onWheel: function(event) {
-                                    var delta = (event.angleDelta.y / 120.0) * (cpuCoresSection.cellH + cpuCoresSection.rowSpacing)
-                                    var maxY = Math.max(0, cpuCoresFlick.contentHeight - cpuCoresFlick.height)
-                                    cpuCoresFlick.contentY = Math.max(0, Math.min(maxY, cpuCoresFlick.contentY - delta))
-                                    event.accepted = true
+                                    var dy = 0
+                                    if (event.angleDelta && event.angleDelta.y !== 0) {
+                                        dy = (event.angleDelta.y / 120.0) * (cpuCoresSection.cellH + cpuCoresSection.rowSpacing)
+                                    } else if (event.pixelDelta && event.pixelDelta.y !== 0) {
+                                        dy = event.pixelDelta.y
+                                    }
+                                    if (dy !== 0) {
+                                        var maxY = Math.max(0, cpuCoresFlick.contentHeight - cpuCoresFlick.height)
+                                        cpuCoresFlick.contentY = Math.max(0, Math.min(maxY, cpuCoresFlick.contentY - dy))
+                                    }
                                 }
                             }
 
