@@ -4,8 +4,6 @@ The idea is simple: keep the things I use every day close at hand, without havin
 
 The interface stays consistent and fluid, while remaining out of the way when not in use. Everything is integrated directly into edge bars and floating panels. Why not have something that is practical and yet beautiful?
 
----
-
 ## What's Inside
 
 The shell organizes its controls around the perimeter of the screen.
@@ -69,7 +67,6 @@ A perimeter drawer for quick scratchpad notes with swipe gestures, saved locally
 | **Detachable Floating Windows** | Panels can be detached from the bar into floating, draggable windows. |
 | **Screen Locker** | Wayland session lock (`ext-session-lock-v1`) with PAM authentication and wallpaper integration (`awww`). |
 
----
 
 ## Requirements
 
@@ -78,8 +75,6 @@ Targeted at **Arch Linux**. Runtime system packages are listed in [`requirements
 ```bash
 grep -vE '^\s*(#|$)' requirements.txt | sudo pacman -S --needed -
 ```
-
----
 
 ## Installation
 
@@ -95,8 +90,6 @@ quickshell -p .
 ./install.sh
 qs
 ```
-
----
 
 ## Window Manager Keybindings
 
@@ -123,8 +116,6 @@ qs ipc call lock lock
 # or: ~/.config/quickshell/commands/lock-screen.sh
 ```
 
----
-
 ## Configuration
 
 Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**.
@@ -139,8 +130,6 @@ Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**
 | [`notifications.config.json`](./config/notifications.config.json) | Popup display timeouts and max visible toast count. |
 | [`layout.config.json`](./config/layout.config.json) | Bar thickness, gaps, margins, and placement coordinates. |
 | [`wallpaper.config.json`](./config/wallpaper.config.json) | Fallback wallpaper path for the screen locker. |
-
----
 
 ## Testing
 
