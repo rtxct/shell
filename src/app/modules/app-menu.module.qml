@@ -49,7 +49,7 @@ Item {
     property bool isTabbing: false
     property var allApps: []
     property var filteredApps: []
-    property int selectedIndex: -1
+    property int selectedIndex: 0
 
     // ── sort options & usage telemetry ──
     property string sortOption: "alphabetically"   // "alphabetically" | "most used"
@@ -63,9 +63,11 @@ Item {
     function toggleSortOption() {
         if (root.sortOption === "alphabetically") {
             root.sortOption = "most used"
+            menuHistoryProc.saveSort("most used")
             menuHistoryProc.initAndLoad()
         } else {
             root.sortOption = "alphabetically"
+            menuHistoryProc.saveSort("alphabetically")
             root.filterApps()
         }
     }
@@ -106,6 +108,9 @@ Item {
             command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "list"]
             running = true
         }
+        function saveSort(opt) {
+            saveSortProc.execute(opt)
+        }
         function record(histType, itemName) {
             recordProc.execute(histType, itemName)
         }
@@ -124,6 +129,9 @@ Item {
                             root.appStorageSize = res.storage.app || "0B"
                             root.cmdStorageSize = res.storage.cmd || "0B"
                         }
+                        if (res.sort && (res.sort === "alphabetically" || res.sort === "most used")) {
+                            root.sortOption = res.sort
+                        }
                         root.filterApps()
                     }
                 } catch(e) {}
@@ -133,6 +141,14 @@ Item {
             if (command && command.indexOf("init") !== -1) {
                 menuHistoryProc.load()
             }
+        }
+    }
+
+    Process {
+        id: saveSortProc
+        function execute(opt) {
+            command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "set-sort", String(opt)]
+            running = true
         }
     }
 
@@ -267,7 +283,7 @@ Item {
 
     onOpenChanged: {
         if (open) {
-            selectedIndex = -1
+            selectedIndex = (currentList && currentList.length > 0) ? 0 : -1
             menuHistoryProc.load()
             reloadApps()
             if (allCommands.length === 0 && !loadCommandsProc.running) {
@@ -343,8 +359,8 @@ Item {
         isSearching = false
         isTabbing = false
         searchInput.text = ""
-        selectedIndex = -1
         filterApps()
+        selectedIndex = (filteredApps.length > 0) ? 0 : -1
     }
 
     function reloadApps() {
@@ -372,7 +388,7 @@ Item {
             return
         }
         filteredApps = ServiceParsers.filterAndSortApps(allApps, searchQuery, root.sortOption, root.appHistory)
-        selectedIndex = -1
+        selectedIndex = (filteredApps.length > 0) ? 0 : -1
     }
 
     function filterClipboard(clipText) {
@@ -381,10 +397,12 @@ Item {
         if (allClipboards.length === 0) {
             loadClipboard()
             filteredClipboards = []
+            selectedIndex = -1
             return
         }
         if (!q) {
             filteredClipboards = allClipboards
+            selectedIndex = (filteredClipboards.length > 0) ? 0 : -1
             return
         }
         var list = []
@@ -398,6 +416,7 @@ Item {
             }
         }
         filteredClipboards = list
+        selectedIndex = (filteredClipboards.length > 0) ? 0 : -1
     }
 
     function filterCommands(cmdText) {
@@ -405,7 +424,7 @@ Item {
             loadCommandsProc.running = true
         }
         filteredCommands = ServiceParsers.filterAndSortCommands(allCommands, cmdText, root.sortOption, root.cmdHistory)
-        selectedIndex = -1
+        selectedIndex = (filteredCommands.length > 0) ? 0 : -1
     }
 
     function applyTabCompletion() {
@@ -462,7 +481,7 @@ Item {
                 app.execute()
             }
             root.close()
-        } else if (searchQuery.trim().length > 0 && filteredApps.length > 0) {
+        } else if (filteredApps.length > 0) {
             var topApp = filteredApps[0]
             if (topApp && typeof topApp.execute === "function") {
                 menuHistoryProc.record("app", topApp.name)
@@ -480,6 +499,7 @@ Item {
     Component.onCompleted: {
         reloadApps()
         loadCommandsProc.running = true
+        menuHistoryProc.load()
     }
 
     // Keyboard handling when search is not yet active
@@ -800,7 +820,6 @@ Item {
                                     root.isSearching = false
                                 }
                                 if (!root.isTabbing) {
-                                    root.selectedIndex = -1
                                     var wasClip = root.isClipboardMode
                                     root.searchQuery = text
                                     if (!wasClip && text.startsWith("\\")) {

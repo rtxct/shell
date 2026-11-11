@@ -97,3 +97,20 @@ def test_app_menu_immediate_focus_and_local_keyboard_exclusivity():
     assert (
         "opacity: (scope.isBottommostScreen && !scope.appMenuOpen && !appMenu.activeOrAnimating) ? 1 : 0" in bar_content
     )
+
+
+def test_app_menu_persists_sort_and_starts_selection_at_zero():
+    app_menu_content = (REPO_ROOT / "src" / "app" / "modules" / "app-menu.module.qml").read_text(encoding="utf-8")
+
+    # Verify initial selectedIndex is 0
+    assert "property int selectedIndex: 0" in app_menu_content
+
+    # Verify sort persistence wiring
+    assert "id: saveSortProc" in app_menu_content
+    assert "set-sort" in app_menu_content
+    assert "menuHistoryProc.saveSort" in app_menu_content
+    assert "res.sort" in app_menu_content
+    assert "menuHistoryProc.load()" in app_menu_content
+
+    # Verify pressing Enter on open launches first item without needing search query
+    assert "else if (filteredApps.length > 0)" in app_menu_content

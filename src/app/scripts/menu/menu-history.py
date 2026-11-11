@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """File: scripts/menu/menu-history.py
-Purpose: Tracks and manages application and command launch usage history in ~/.cache/quickshell-menu.
+Purpose: Tracks and manages application and command launch usage history and persisted sorting in ~/.cache/quickshell-menu.
 Public API:
-  - init: Ensures cache directory and history files (app.hist, cmd.hist) exist.
-  - list: Outputs JSON dictionary with {"app": {...}, "cmd": {...}, "storage": {"app": str, "cmd": str}}.
+  - init: Ensures cache directory and history files (app.hist, cmd.hist, sort.state) exist.
+  - list: Outputs JSON dictionary with {"app": {...}, "cmd": {...}, "storage": {"app": str, "cmd": str}, "sort": str}.
   - get <app|cmd>: Outputs JSON dictionary with counts and single file storage.
   - record <app|cmd> <name>: Increments usage count for <name> in the specified history file.
   - prune <app|cmd>: Deletes only the specified history file and resets its tracking.
+  - set-sort <alphabetically|most used>: Persists the active sorting option in sort.state.
 Dependencies: argparse, json, pathlib, subprocess, sys
 """
 
@@ -21,6 +22,7 @@ from pathlib import Path
 CACHE_DIR = Path.home() / ".cache" / "quickshell-menu"
 APP_HIST = CACHE_DIR / "app.hist"
 CMD_HIST = CACHE_DIR / "cmd.hist"
+SORT_FILE = CACHE_DIR / "sort.state"
 
 
 def get_hist_file(hist_type: str) -> Path:
@@ -31,12 +33,36 @@ def get_hist_file(hist_type: str) -> Path:
     raise ValueError(f"Unknown history type: {hist_type} (expected 'app' or 'cmd')")
 
 
+def load_sort_option() -> str:
+    if not SORT_FILE.exists():
+        return "alphabetically"
+    try:
+        opt = SORT_FILE.read_text(encoding="utf-8").strip()
+        return opt if opt in ("alphabetically", "most used") else "alphabetically"
+    except OSError:
+        return "alphabetically"
+
+
+def save_sort_option(opt: str) -> None:
+    ensure_cache_files()
+    val = opt if opt in ("alphabetically", "most used") else "alphabetically"
+    try:
+        SORT_FILE.write_text(val + "\n", encoding="utf-8")
+    except OSError as err:
+        sys.stderr.write(f"Error writing {SORT_FILE}: {err}\n")
+
+
 def ensure_cache_files() -> None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     if not APP_HIST.exists():
         APP_HIST.touch()
     if not CMD_HIST.exists():
         CMD_HIST.touch()
+    if not SORT_FILE.exists():
+        try:
+            SORT_FILE.write_text("alphabetically\n", encoding="utf-8")
+        except OSError:
+            pass
 
 
 def get_file_size(path: Path) -> str:
@@ -155,6 +181,10 @@ def main() -> None:
     prune_p = subparsers.add_parser("prune", help="Delete specific history file ('app' or 'cmd')")
     prune_p.add_argument("type", choices=["app", "cmd"], help="History type ('app' or 'cmd')")
 
+    # Subcommand: set-sort <option>
+    sort_p = subparsers.add_parser("set-sort", help="Save sorting option ('alphabetically' or 'most used')")
+    sort_p.add_argument("option", choices=["alphabetically", "most used"], help="Sort option")
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -167,6 +197,7 @@ def main() -> None:
                 "app": get_file_size(APP_HIST),
                 "cmd": get_file_size(CMD_HIST),
             },
+            "sort": load_sort_option(),
         }
         sys.stdout.write(json.dumps(data) + "\n")
     elif args.command == "get":
@@ -178,6 +209,8 @@ def main() -> None:
         sys.stdout.write(json.dumps(data) + "\n")
     elif args.command == "record":
         record_usage(args.type, args.name)
+    elif args.command == "set-sort":
+        save_sort_option(args.option)
     elif args.command == "prune":
         prune_history(args.type)
         data = {
@@ -187,6 +220,7 @@ def main() -> None:
                 "app": get_file_size(APP_HIST),
                 "cmd": get_file_size(CMD_HIST),
             },
+            "sort": load_sort_option(),
         }
         sys.stdout.write(json.dumps(data) + "\n")
 

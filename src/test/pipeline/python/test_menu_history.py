@@ -20,16 +20,20 @@ def test_ensure_cache_files(tmp_path: Path):
     cache_dir = tmp_path / "quickshell-menu"
     app_hist = cache_dir / "app.hist"
     cmd_hist = cache_dir / "cmd.hist"
+    sort_file = cache_dir / "sort.state"
 
     with (
         patch.object(hist_mod, "CACHE_DIR", cache_dir),
         patch.object(hist_mod, "APP_HIST", app_hist),
         patch.object(hist_mod, "CMD_HIST", cmd_hist),
+        patch.object(hist_mod, "SORT_FILE", sort_file),
     ):
         hist_mod.ensure_cache_files()
         assert cache_dir.is_dir()
         assert app_hist.is_file()
         assert cmd_hist.is_file()
+        assert sort_file.is_file()
+        assert sort_file.read_text(encoding="utf-8").strip() == "alphabetically"
 
 
 def test_record_and_load_usage(tmp_path: Path):
@@ -108,16 +112,19 @@ def test_cli_subcommands(tmp_path: Path, capsys):
     cache_dir = tmp_path / "quickshell-menu"
     app_hist = cache_dir / "app.hist"
     cmd_hist = cache_dir / "cmd.hist"
+    sort_file = cache_dir / "sort.state"
 
     with (
         patch.object(hist_mod, "CACHE_DIR", cache_dir),
         patch.object(hist_mod, "APP_HIST", app_hist),
         patch.object(hist_mod, "CMD_HIST", cmd_hist),
+        patch.object(hist_mod, "SORT_FILE", sort_file),
     ):
         with patch("sys.argv", ["menu-history.py", "init"]):
             hist_mod.main()
         assert app_hist.exists()
         assert cmd_hist.exists()
+        assert sort_file.exists()
 
         with patch("sys.argv", ["menu-history.py", "record", "app", "code"]):
             hist_mod.main()
@@ -140,6 +147,18 @@ def test_cli_subcommands(tmp_path: Path, capsys):
         assert all_data["cmd"] == {"neofetch": 1}
         assert "app" in all_data["storage"]
         assert "cmd" in all_data["storage"]
+        assert all_data["sort"] == "alphabetically"
+
+        # Change sort option
+        with patch("sys.argv", ["menu-history.py", "set-sort", "most used"]):
+            hist_mod.main()
+        assert sort_file.read_text(encoding="utf-8").strip() == "most used"
+
+        with patch("sys.argv", ["menu-history.py", "list"]):
+            hist_mod.main()
+        captured_sort = capsys.readouterr()
+        sort_data = json.loads(captured_sort.out)
+        assert sort_data["sort"] == "most used"
 
         # Prune app CLI
         with patch("sys.argv", ["menu-history.py", "prune", "app"]):
@@ -149,5 +168,32 @@ def test_cli_subcommands(tmp_path: Path, capsys):
         assert prune_data["app"] == {}
         assert prune_data["cmd"] == {"neofetch": 1}
         assert prune_data["storage"]["app"] == "0B"
+        assert prune_data["sort"] == "most used"
         assert not app_hist.exists()
         assert cmd_hist.exists()
+        assert sort_file.exists()
+
+
+def test_sort_option_persistence(tmp_path: Path):
+    cache_dir = tmp_path / "quickshell-menu"
+    sort_file = cache_dir / "sort.state"
+
+    with (
+        patch.object(hist_mod, "CACHE_DIR", cache_dir),
+        patch.object(hist_mod, "SORT_FILE", sort_file),
+    ):
+        # Default when missing
+        assert hist_mod.load_sort_option() == "alphabetically"
+
+        # Save and reload
+        hist_mod.save_sort_option("most used")
+        assert sort_file.is_file()
+        assert hist_mod.load_sort_option() == "most used"
+
+        # Switch back to alphabetically
+        hist_mod.save_sort_option("alphabetically")
+        assert hist_mod.load_sort_option() == "alphabetically"
+
+        # Fallback for corrupted/invalid value
+        sort_file.write_text("invalid_option\n", encoding="utf-8")
+        assert hist_mod.load_sort_option() == "alphabetically"
