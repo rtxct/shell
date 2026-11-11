@@ -61,7 +61,6 @@ QtObject {
     readonly property int clearIconFontPx: 12
     readonly property real clearHitPadding: 6
 
-    readonly property real listVerticalReserve: 20
     readonly property real scrollBarRightMargin: 2
     readonly property real scrollBarWidth: 3
     readonly property real scrollBarMinHeight: 16
@@ -79,4 +78,15 @@ QtObject {
     readonly property real dividerLeftMargin: 16
     readonly property real dividerRightMargin: 16
     readonly property real dividerHeight: 1
+
+    // ── Sort Options Footer Tokens ──
+    readonly property real sortFooterHeight: 28
+    readonly property real sortDividerMargin: 12
+    readonly property real sortDividerHeight: 1
+    readonly property color sortDividerColor: Theme.borderWhite
+    readonly property int sortTextFontPx: 11
+    readonly property color sortTextColor: Theme.textDim
+    readonly property color sortTextHoverColor: Theme.textBright
+    readonly property int sortAnimDurationMs: 180
+    readonly property int sortFadeDurationMs: 150
 }

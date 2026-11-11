@@ -1,16 +1,24 @@
 // ============================================================================
 // File: modules/app-menu.module.qml
-// Purpose: Docked desktop applications menu with type-to-search auto-reveal, keyboard navigation, and drag-to-detach handle.
+// Purpose: Docked desktop applications menu with type-to-search auto-reveal,
+//          keyboard navigation, sort options (alphabetical/most used), and
+//          drag-to-detach handle.
 // Public API:
-//   - Properties: open, floatManager, fg, dim, accent, cardBg, searchQuery, isSearching, allApps, filteredApps, selectedIndex ...
+//   - Properties: open, floatManager, fg, dim, accent, cardBg, searchQuery,
+//                 isSearching, allApps, filteredApps, selectedIndex,
+//                 sortOption, appHistory, cmdHistory, appStorageSize,
+//                 cmdStorageSize, currentStorageSize ...
 //   - Signals:    closeRequested()
-//   - Functions:  close(), resetSearch(), reloadApps(), filterApps(), launchCurrent(), applyTabCompletion()
-// Dependencies: QtQuick, "../components", "../styles", "../theme", QtQuick.Layouts, Quickshell, Quickshell.Widgets
+//   - Functions:  close(), resetSearch(), reloadApps(), filterApps(),
+//                 launchCurrent(), applyTabCompletion(), toggleSortOption(),
+//                 pruneCache()
+// Dependencies: QtQuick, "../components", "../styles", "../theme", QtQuick.Layouts, Quickshell, Quickshell.Io, Quickshell.Widgets
 // ============================================================================
 import QtQuick
 import "../components"
 import "../styles"
 import "../../../themes"
+import "../components/service-parsers.js" as ServiceParsers
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
@@ -43,6 +51,39 @@ Item {
     property var filteredApps: []
     property int selectedIndex: -1
 
+    // ── sort options & usage telemetry ──
+    property string sortOption: "alphabetically"   // "alphabetically" | "most used"
+    property var appHistory: ({})
+    property var cmdHistory: ({})
+    property string appStorageSize: "0B"
+    property string cmdStorageSize: "0B"
+    readonly property string currentStorageSize: isCommandMode ? cmdStorageSize : appStorageSize
+    readonly property bool sortFooterActive: !isClipboardMode
+
+    function toggleSortOption() {
+        if (root.sortOption === "alphabetically") {
+            root.sortOption = "most used"
+            menuHistoryProc.initAndLoad()
+        } else {
+            root.sortOption = "alphabetically"
+            root.filterApps()
+        }
+    }
+
+    function pruneCache() {
+        if (root.isCommandMode) {
+            root.cmdHistory = ({})
+            root.cmdStorageSize = "0B"
+            menuHistoryProc.prune("cmd")
+            root.filterApps()
+        } else {
+            root.appHistory = ({})
+            root.appStorageSize = "0B"
+            menuHistoryProc.prune("app")
+            root.filterApps()
+        }
+    }
+
     // ── command execution mode (triggered by ">") ──
     readonly property bool isCommandMode: searchQuery.startsWith(">")
     property var allCommands: []
@@ -54,6 +95,57 @@ Item {
     property var filteredClipboards: []
 
     readonly property var currentList: isClipboardMode ? filteredClipboards : (isCommandMode ? filteredCommands : filteredApps)
+
+    Process {
+        id: menuHistoryProc
+        function initAndLoad() {
+            command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "init"]
+            running = true
+        }
+        function load() {
+            command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "list"]
+            running = true
+        }
+        function record(histType, itemName) {
+            recordProc.execute(histType, itemName)
+        }
+        function prune(histType) {
+            command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "prune", histType]
+            running = true
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    var res = JSON.parse(this.text)
+                    if (res && res.app !== undefined && res.cmd !== undefined) {
+                        root.appHistory = res.app
+                        root.cmdHistory = res.cmd
+                        if (res.storage) {
+                            root.appStorageSize = res.storage.app || "0B"
+                            root.cmdStorageSize = res.storage.cmd || "0B"
+                        }
+                        root.filterApps()
+                    }
+                } catch(e) {}
+            }
+        }
+        onExited: {
+            if (command && command.indexOf("init") !== -1) {
+                menuHistoryProc.load()
+            }
+        }
+    }
+
+    Process {
+        id: recordProc
+        function execute(histType, itemName) {
+            command = ["python3", Quickshell.shellPath("src/app/scripts/menu/menu-history.py"), "record", histType, String(itemName)]
+            running = true
+        }
+        onExited: {
+            menuHistoryProc.load()
+        }
+    }
 
     Process {
         id: loadCommandsProc
@@ -176,6 +268,7 @@ Item {
     onOpenChanged: {
         if (open) {
             selectedIndex = -1
+            menuHistoryProc.load()
             reloadApps()
             if (allCommands.length === 0 && !loadCommandsProc.running) {
                 loadCommandsProc.running = true
@@ -185,7 +278,13 @@ Item {
             }
             root.focusMenu()
             Qt.callLater(root.focusMenu)
-        } else {
+        } else if (!activeOrAnimating) {
+            resetSearch()
+        }
+    }
+
+    onActiveOrAnimatingChanged: {
+        if (!activeOrAnimating && !open) {
             resetSearch()
         }
     }
@@ -272,30 +371,7 @@ Item {
             filterCommands(searchQuery.slice(1))
             return
         }
-        var q = searchQuery.trim().toLowerCase()
-        if (!q) {
-            filteredApps = allApps
-            selectedIndex = -1
-            return
-        }
-        var list = []
-        for (var i = 0; i < allApps.length; i++) {
-            var app = allApps[i]
-            var name = app.name.toLowerCase()
-            var comment = (app.comment || "").toLowerCase()
-            var gen = (app.genericName || "").toLowerCase()
-            if (name.includes(q) || comment.includes(q) || gen.includes(q)) {
-                list.push(app)
-            }
-        }
-        list.sort(function(a, b) {
-            var aStarts = a.name.toLowerCase().startsWith(q)
-            var bStarts = b.name.toLowerCase().startsWith(q)
-            if (aStarts && !bStarts) return -1
-            if (!aStarts && bStarts) return 1
-            return a.name.localeCompare(b.name)
-        })
-        filteredApps = list
+        filteredApps = ServiceParsers.filterAndSortApps(allApps, searchQuery, root.sortOption, root.appHistory)
         selectedIndex = -1
     }
 
@@ -325,54 +401,10 @@ Item {
     }
 
     function filterCommands(cmdText) {
-        var raw = cmdText.trim()
-        var q = raw.toLowerCase()
-        var list = []
-
-        if (raw.length > 0) {
-            list.push({
-                name: raw,
-                desc: "Run with zsh: " + raw,
-                type: "exec",
-                isCustomExec: true
-            })
+        if (allCommands.length === 0 && !loadCommandsProc.running) {
+            loadCommandsProc.running = true
         }
-
-        if (allCommands.length === 0) {
-            if (!loadCommandsProc.running) loadCommandsProc.running = true
-            filteredCommands = list
-            selectedIndex = -1
-            return
-        }
-
-        if (!q) {
-            for (var i = 0; i < allCommands.length && list.length < 50; i++) {
-                list.push(allCommands[i])
-            }
-        } else {
-            var exactMatches = []
-            var prefixMatches = []
-            var containsMatches = []
-            for (var j = 0; j < allCommands.length; j++) {
-                var c = allCommands[j]
-                var cName = c.name.toLowerCase()
-                if (cName === q) {
-                    exactMatches.push(c)
-                } else if (cName.startsWith(q)) {
-                    prefixMatches.push(c)
-                } else if (cName.indexOf(q) !== -1 || (c.desc && c.desc.toLowerCase().indexOf(q) !== -1)) {
-                    containsMatches.push(c)
-                }
-            }
-            var combined = exactMatches.concat(prefixMatches).concat(containsMatches)
-            for (var k = 0; k < combined.length && list.length < 50; k++) {
-                if (list.length > 0 && list[0].isCustomExec && list[0].name.toLowerCase() === combined[k].name.toLowerCase()) {
-                    continue
-                }
-                list.push(combined[k])
-            }
-        }
-        filteredCommands = list
+        filteredCommands = ServiceParsers.filterAndSortCommands(allCommands, cmdText, root.sortOption, root.cmdHistory)
         selectedIndex = -1
     }
 
@@ -416,6 +448,7 @@ Item {
                 cmdToRun = filteredCommands[0].name
             }
             if (cmdToRun) {
+                menuHistoryProc.record("cmd", cmdToRun)
                 runCmdProc.execute(cmdToRun)
                 root.close()
             }
@@ -425,12 +458,14 @@ Item {
         if (selectedIndex >= 0 && selectedIndex < filteredApps.length) {
             var app = filteredApps[selectedIndex]
             if (app && typeof app.execute === "function") {
+                menuHistoryProc.record("app", app.name)
                 app.execute()
             }
             root.close()
         } else if (searchQuery.trim().length > 0 && filteredApps.length > 0) {
             var topApp = filteredApps[0]
             if (topApp && typeof topApp.execute === "function") {
+                menuHistoryProc.record("app", topApp.name)
                 topApp.execute()
             }
             root.close()
@@ -605,12 +640,11 @@ Item {
         }
 
         // ── 2. EXPANDED MENU CONTENT (fades in as Drop opens up in Phase 3) ──
-        Column {
+        Item {
             id: expandedContentCol
             parent: card.contentArea
             anchors.fill: parent
             anchors.margins: AppMenuStyle.cardPadding
-            spacing: AppMenuStyle.cardSpacing
             opacity: (root.openProgress > root.p2) ? Math.max(0.0, (root.openProgress - root.p2) / Math.max(0.001, 1.0 - root.p2)) : 0.0
             visible: root.open || root.activeOrAnimating || root.isActivelyDetaching
             enabled: root.open || root.isActivelyDetaching
@@ -619,7 +653,9 @@ Item {
             // Top Drag Handle Bar
             Item {
                 id: dragHandleBar
-                width: parent.width
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
                 height: AppMenuStyle.dragHandleHeight
                 enabled: (root.open && expandedContentCol.opacity > 0.8) || dragHandleMouse.isDetaching
 
@@ -695,7 +731,10 @@ Item {
             // while remaining visible/enabled so searchInput holds activeFocus from t=0ms.
             Item {
                 id: searchBarContainer
-                width: parent.width
+                anchors.top: dragHandleBar.bottom
+                anchors.topMargin: (root.isSearching || searchInput.text.length > 0) ? AppMenuStyle.cardSpacing : 0
+                anchors.left: parent.left
+                anchors.right: parent.right
                 height: (root.isSearching || searchInput.text.length > 0) ? AppMenuStyle.searchBarHeight : 0
                 opacity: (root.isSearching || searchInput.text.length > 0) ? 1.0 : 0.0
                 visible: true
@@ -707,6 +746,9 @@ Item {
                 }
                 Behavior on opacity {
                     NumberAnimation { duration: AppMenuStyle.searchFadeDurationMs; easing.type: Easing.OutCubic }
+                }
+                Behavior on anchors.topMargin {
+                    NumberAnimation { duration: AppMenuStyle.searchRevealDurationMs; easing.type: Easing.OutCubic }
                 }
 
                 Rectangle {
@@ -852,13 +894,24 @@ Item {
             // Application / Command List
             ListView {
                 id: appListView
-                width: parent.width
-                height: Math.max(0, parent.height - AppMenuStyle.listVerticalReserve - (searchBarContainer.height > 1 ? searchBarContainer.height + parent.spacing : 0))
+                anchors.top: searchBarContainer.bottom
+                anchors.topMargin: AppMenuStyle.cardSpacing
+                anchors.bottom: sortFooter.top
+                anchors.bottomMargin: root.sortFooterActive ? AppMenuStyle.cardSpacing : 0
+                anchors.left: parent.left
+                anchors.right: parent.right
                 enabled: root.open && expandedContentCol.opacity > 0.8
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 currentIndex: root.selectedIndex
                 model: root.currentList
+
+                Behavior on anchors.bottomMargin {
+                    NumberAnimation {
+                        duration: AppMenuStyle.sortAnimDurationMs
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
                 // Scroll indicator
                 Rectangle {
@@ -952,12 +1005,14 @@ Item {
                             }
                             if (root.isCommandMode) {
                                 if (row.modelData && row.modelData.name) {
+                                    menuHistoryProc.record("cmd", row.modelData.name)
                                     runCmdProc.execute(row.modelData.name)
                                     root.close()
                                 }
                                 return
                             }
                             if (row.modelData && typeof row.modelData.execute === "function") {
+                                menuHistoryProc.record("app", row.modelData.name)
                                 row.modelData.execute()
                             }
                             root.close()
@@ -974,6 +1029,175 @@ Item {
                         : (root.isCommandMode ? "No matching commands found" : (root.searchQuery ? "No applications found" : "No applications available"))
                     color: root.dim
                     font.pixelSize: AppMenuStyle.appNameFontPx
+                }
+            }
+
+            // ── 3. Bottom Sort Options Bar (Hidden in clipboard mode with smooth slide up/down) ──
+            Item {
+                id: sortFooter
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: root.sortFooterActive ? AppMenuStyle.sortFooterHeight : 0
+                opacity: root.sortFooterActive ? 1.0 : 0.0
+                visible: height > 0
+                clip: true
+
+                Behavior on height {
+                    NumberAnimation {
+                        duration: AppMenuStyle.sortAnimDurationMs
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: AppMenuStyle.sortFadeDurationMs
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                // Horizontal bright bar line (leaves space at edges, brightens with light on hover)
+                Rectangle {
+                    id: sortDivider
+                    anchors.top: parent.top
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Math.max(0, parent.width - 2 * AppMenuStyle.sortDividerMargin)
+                    height: AppMenuStyle.sortDividerHeight
+                    color: AppMenuStyle.sortDividerColor
+                    opacity: (sortOptionMouse.containsMouse || pruneMouse.containsMouse) ? 1.0 : 0.45
+                    Behavior on opacity {
+                        NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+                    }
+                }
+
+                Item {
+                    anchors.fill: parent
+                    anchors.topMargin: AppMenuStyle.sortDividerHeight
+
+                    // 1. Left informative text: "storage: {amount}" (non-clickable)
+                    Row {
+                        id: storageInfoRow
+                        anchors.left: parent.left
+                        anchors.leftMargin: AppMenuStyle.sortDividerMargin + 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 4
+
+                        Text {
+                            text: "storage:"
+                            color: AppMenuStyle.sortTextColor
+                            font.pixelSize: AppMenuStyle.sortTextFontPx
+                            font.weight: Font.Normal
+                        }
+
+                        Text {
+                            text: root.currentStorageSize
+                            color: AppMenuStyle.sortTextColor
+                            font.pixelSize: AppMenuStyle.sortTextFontPx
+                            font.weight: Font.DemiBold
+                        }
+                    }
+
+                    // 2. Centered interactive sorting text: "sorting: {option}" (brightens on hover)
+                    Item {
+                        id: sortOptionBtn
+                        anchors.centerIn: parent
+                        width: sortTextRow.width + 16
+                        height: parent.height
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: sortTextRow.width + 12
+                            height: sortTextRow.height + 6
+                            radius: 6
+                            color: sortOptionMouse.containsMouse ? AppMenuStyle.rowHoverBg : AppMenuStyle.transparent
+                            Behavior on color {
+                                ColorAnimation { duration: 140 }
+                            }
+                        }
+
+                        Row {
+                            id: sortTextRow
+                            anchors.centerIn: parent
+                            spacing: 4
+                            opacity: sortOptionMouse.containsMouse ? 1.0 : 0.8
+                            Behavior on opacity {
+                                NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+                            }
+
+                            Text {
+                                text: "sorting:"
+                                color: sortOptionMouse.containsMouse ? AppMenuStyle.sortTextHoverColor : AppMenuStyle.sortTextColor
+                                font.pixelSize: AppMenuStyle.sortTextFontPx
+                                font.weight: Font.Normal
+                                Behavior on color {
+                                    ColorAnimation { duration: 140 }
+                                }
+                            }
+
+                            Text {
+                                text: root.sortOption
+                                color: sortOptionMouse.containsMouse ? AppMenuStyle.sortTextHoverColor : AppMenuStyle.accent
+                                font.pixelSize: AppMenuStyle.sortTextFontPx
+                                font.weight: Font.DemiBold
+                                Behavior on color {
+                                    ColorAnimation { duration: 140 }
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: sortOptionMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.toggleSortOption()
+                        }
+                    }
+
+                    // 3. Right clickable button: "prune" (brightens on hover)
+                    Item {
+                        id: pruneBtn
+                        anchors.right: parent.right
+                        anchors.rightMargin: AppMenuStyle.sortDividerMargin + 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: pruneText.width + 16
+                        height: parent.height
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: pruneText.width + 12
+                            height: pruneText.height + 6
+                            radius: 6
+                            color: pruneMouse.containsMouse ? AppMenuStyle.rowHoverBg : AppMenuStyle.transparent
+                            Behavior on color {
+                                ColorAnimation { duration: 140 }
+                            }
+                        }
+
+                        Text {
+                            id: pruneText
+                            anchors.centerIn: parent
+                            text: "prune"
+                            color: pruneMouse.containsMouse ? AppMenuStyle.sortTextHoverColor : AppMenuStyle.sortTextColor
+                            font.pixelSize: AppMenuStyle.sortTextFontPx
+                            font.weight: Font.DemiBold
+                            opacity: pruneMouse.containsMouse ? 1.0 : 0.8
+                            Behavior on color {
+                                ColorAnimation { duration: 140 }
+                            }
+                            Behavior on opacity {
+                                NumberAnimation { duration: 140; easing.type: Easing.OutCubic }
+                            }
+                        }
+
+                        MouseArea {
+                            id: pruneMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.pruneCache()
+                        }
+                    }
                 }
             }
         }
