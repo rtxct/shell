@@ -55,3 +55,18 @@ def test_notification_overlay_has_no_phantom_scroll_thumb():
     assert "id: scrollThumb" not in overlay_content
     assert "scrollThumb" not in overlay_content
     assert "overflowPillColor" not in overlay_content
+
+
+def test_notification_card_text_sanitization_and_line_bounds():
+    card_content = CARD_COMPONENT.read_text(encoding="utf-8")
+
+    # Verify ServiceParsers import and usage for sanitizing summary and body
+    assert 'import "./service-parsers.js" as ServiceParsers' in card_content
+    assert "ServiceParsers.cleanNotificationText(root.notification ? (root.notification.summary ||" in card_content
+    assert "ServiceParsers.cleanNotificationText(root.notification ? (root.notification.body ||" in card_content
+
+    # Verify maximumLineCount: 1 is set to prevent multiline expansion
+    assert card_content.count("maximumLineCount: 1") >= 2
+
+    # Verify clipping is active on contentArea and Column to bound any overflow
+    assert "clip: true" in card_content

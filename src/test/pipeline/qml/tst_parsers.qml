@@ -335,5 +335,32 @@ TestCase {
         compare(querySorted.length, 1)
         compare(querySorted[0].name, "Zathura")
     }
+
+    function test_clean_notification_text_line_breaks_and_html() {
+        // Null and empty handling
+        compare(ServiceParsers.cleanNotificationText(null), "")
+        compare(ServiceParsers.cleanNotificationText(undefined), "")
+        compare(ServiceParsers.cleanNotificationText(""), "")
+
+        // Plain text with line breaks
+        compare(ServiceParsers.cleanNotificationText("Hello\nWorld"), "Hello World")
+        compare(ServiceParsers.cleanNotificationText("Hello\r\nWorld\r\nAgain"), "Hello World Again")
+        compare(ServiceParsers.cleanNotificationText("Line 1\n\n\nLine 2"), "Line 1 Line 2")
+
+        // Unicode line and paragraph separators
+        compare(ServiceParsers.cleanNotificationText("First\u2028Second\u2029Third"), "First Second Third")
+
+        // HTML break and block tags
+        compare(ServiceParsers.cleanNotificationText("First<br>Second<br/>Third<br />Fourth"), "First Second Third Fourth")
+        compare(ServiceParsers.cleanNotificationText("<p class=\"msg\">Hello</p><p>World</p>"), "Hello World")
+        compare(ServiceParsers.cleanNotificationText("<div>Line A</div><div>Line B</div>"), "Line A Line B")
+
+        // Mixed whitespace and tabs
+        compare(ServiceParsers.cleanNotificationText("   Trim \t leading \n\n and trailing   "), "Trim leading and trailing")
+
+        // Preservation of inline markup while converting breaks
+        compare(ServiceParsers.cleanNotificationText("<b>Sender</b>:\nMessage body"), "<b>Sender</b>: Message body")
+    }
 }
+
 

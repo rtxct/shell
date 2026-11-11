@@ -5,7 +5,7 @@
 //   - Properties: screenW, screenH, cardW, cardH, bubbleW, bubbleH, restingGlobalY, phase, isActive, notification, urgency, urgencyColor
 //   - Signals:    dismissRequested()
 //   - Functions:  startSpawn(restingY), startDismiss()
-// Dependencies: QtQuick, "../styles", "../theme", QtQuick.Layouts, Quickshell, Quickshell.Widgets, Quickshell.Services.Notifications
+// Dependencies: QtQuick, "../styles", "../theme", QtQuick.Layouts, Quickshell, Quickshell.Widgets, Quickshell.Services.Notifications, "./service-parsers.js"
 // ============================================================================
 import QtQuick
 import "../styles"
@@ -14,6 +14,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.Notifications
+import "./service-parsers.js" as ServiceParsers
 
 // Notification card designed for vertical stacking accumulation with water bubble
 // emergence physics, fluid expansion, urgency border styling, and dismissal collapse.
@@ -312,6 +313,7 @@ Item {
             anchors.topMargin: NotificationCardStyle.contentVerticalMargin
             anchors.bottomMargin: NotificationCardStyle.contentVerticalMargin
             opacity: 0.0
+            clip: true
 
             // ── Left Icon ──
             Item {
@@ -378,23 +380,27 @@ Item {
                 anchors.rightMargin: NotificationCardStyle.contentRightMargin
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: NotificationCardStyle.contentTextSpacing
+                clip: true
 
                 Text {
                     width: parent.width
-                    text: root.notification ? (root.notification.summary || "") : ""
+                    text: ServiceParsers.cleanNotificationText(root.notification ? (root.notification.summary || "") : "")
                     color: NotificationCardStyle.summaryText
                     font.pixelSize: NotificationCardStyle.summaryFontPx
                     font.weight: Font.DemiBold
                     elide: Text.ElideRight
+                    maximumLineCount: 1
+                    visible: text.length > 0
                     textFormat: Text.AutoText
                 }
 
                 Text {
                     width: parent.width
-                    text: root.notification ? (root.notification.body || "") : ""
+                    text: ServiceParsers.cleanNotificationText(root.notification ? (root.notification.body || "") : "")
                     color: NotificationCardStyle.bodyText
                     font.pixelSize: NotificationCardStyle.bodyFontPx
                     elide: Text.ElideRight
+                    maximumLineCount: 1
                     visible: text.length > 0
                     textFormat: Text.AutoText
                 }

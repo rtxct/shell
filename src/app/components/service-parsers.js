@@ -3,7 +3,7 @@
 // Purpose: Pure, stateless parsing and formatting helpers for Weather
 //          (Open-Meteo JSON & WMO weather codes), Audio (wpctl output),
 //          Workspaces (Niri JSON & collapsed strip filtering), Processes,
-//          and Menu launch history and sorting.
+//          Menu launch history and sorting, and Notification text sanitization.
 //          Extracted as a stateless JS library (.pragma library) so both
 //          Quickshell service modules and Qt Quick Test cases (qmltestrunner)
 //          can execute and verify them without Quickshell I/O.
@@ -903,6 +903,24 @@ function filterAndSortCommands(allCommands, searchQuery, sortOption, historyMap)
 
     return list
 }
+
+/**
+ * Sanitize notification summary/body text by converting line breaks and HTML
+ * block/break tags (<p>, <br>, <div>, etc.) into spaces, collapsing consecutive
+ * whitespace, and trimming, preventing multiline overflow in compact cards and bars.
+ */
+function cleanNotificationText(raw) {
+    if (!raw) return ""
+    var s = String(raw)
+    // Replace HTML block & break tags (and any attributes) with a single space
+    s = s.replace(/<\/?(?:div|p|h[1-6]|li|tr|blockquote|br)(?:\s+[^>]*|\s*\/)?>/gi, " ")
+    // Replace all carriage returns, newlines, tabs, and unicode line/paragraph breaks with a space
+    s = s.replace(/[\r\n\t\u2028\u2029]+/g, " ")
+    // Collapse multiple consecutive spaces into a single space
+    s = s.replace(/\s{2,}/g, " ")
+    return s.trim()
+}
+
 
 
 

@@ -179,8 +179,8 @@ Item {
             // Store in history for Notification Center
             var item = {
                 id: notification.id,
-                summary: notification.summary || "",
-                body: notification.body || "",
+                summary: ServiceParsers.cleanNotificationText(notification.summary || ""),
+                body: ServiceParsers.cleanNotificationText(notification.body || ""),
                 appName: notification.appName || notification.desktopEntry || "Notification",
                 desktopEntry: notification.desktopEntry || "",
                 appIcon: notification.appIcon || "",

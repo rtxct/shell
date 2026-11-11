@@ -475,6 +475,8 @@ Item {
                                     font.pixelSize: NotificationCenterBarStyle.rowTitleFontPx
                                     font.weight: Font.DemiBold
                                     elide: Text.ElideRight
+                                    maximumLineCount: 1
+                                    visible: text.length > 0
                                 }
 
                                 Text {
@@ -483,6 +485,7 @@ Item {
                                     color: NotificationCenterBarStyle.textSecondary
                                     font.pixelSize: NotificationCenterBarStyle.rowBodyFontPx
                                     elide: Text.ElideRight
+                                    maximumLineCount: 1
                                     visible: text.length > 0
                                 }
                             }
@@ -853,6 +856,8 @@ Item {
                                             font.pixelSize: NotificationCenterBarStyle.rowTitleFontPx
                                             font.weight: Font.DemiBold
                                             elide: Text.ElideRight
+                                            maximumLineCount: 1
+                                            visible: text.length > 0
                                         }
 
                                         Text {
@@ -861,6 +866,7 @@ Item {
                                             color: NotificationCenterBarStyle.textSecondary
                                             font.pixelSize: NotificationCenterBarStyle.rowBodyFontPx
                                             elide: Text.ElideRight
+                                            maximumLineCount: 1
                                             visible: text.length > 0
                                         }
                                     }
