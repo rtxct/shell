@@ -9,6 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 CARD_COMPONENT = REPO_ROOT / "src" / "app" / "components" / "notification-card.component.qml"
 CARD_STYLE = REPO_ROOT / "src" / "app" / "styles" / "notification-card.style.qml"
 OVERLAY_MODULE = REPO_ROOT / "src" / "app" / "modules" / "notification-overlay.module.qml"
+NOTIFICATIONS_SERVICE = REPO_ROOT / "src" / "app" / "modules" / "notifications-service.module.qml"
 
 
 def test_notification_card_style_has_close_button_tokens():
@@ -70,3 +71,18 @@ def test_notification_card_text_sanitization_and_line_bounds():
 
     # Verify clipping is active on contentArea and Column to bound any overflow
     assert "clip: true" in card_content
+
+
+def test_notification_service_activates_default_action_and_focus_window():
+    service_content = NOTIFICATIONS_SERVICE.read_text(encoding="utf-8")
+
+    # Verify activateNotification accesses notifObj.actions directly, not .values
+    assert "notifObj.actions.values" not in service_content
+    assert "if (notifObj && notifObj.actions)" in service_content
+
+    # Verify action lookup finds 'default' identifier and invokes it
+    assert 'act.identifier === "default"' in service_content
+    assert "defAct.invoke()" in service_content
+
+    # Verify focus-notification-app script is invoked
+    assert "focus-notification-app.sh" in service_content

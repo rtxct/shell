@@ -129,20 +129,24 @@ Item {
     function activateNotification(itemOrNotif) {
         if (!itemOrNotif) return
         var notifObj = itemOrNotif.notificationRef ? itemOrNotif.notificationRef : itemOrNotif
-        if (notifObj && notifObj.actions && notifObj.actions.values) {
-            var acts = notifObj.actions.values
+        if (notifObj && notifObj.actions) {
+            var acts = notifObj.actions
+            var count = (typeof acts.length === "number") ? acts.length : (acts.count !== undefined ? acts.count : 0)
             var defAct = null
-            for (var i = 0; i < acts.length; i++) {
-                if (acts[i].identifier === "default") {
-                    defAct = acts[i]
+            for (var i = 0; i < count; i++) {
+                var act = acts[i] || (acts.at ? acts.at(i) : null)
+                if (act && act.identifier === "default") {
+                    defAct = act
                     break
                 }
             }
-            if (!defAct && acts.length > 0) {
-                defAct = acts[0]
+            if (!defAct && count > 0) {
+                defAct = acts[0] || (acts.at ? acts.at(0) : null)
             }
-            if (defAct) {
-                try { defAct.invoke() } catch (e) {}
+            if (defAct && typeof defAct.invoke === "function") {
+                try {
+                    defAct.invoke()
+                } catch (e) {}
             }
         }
 
