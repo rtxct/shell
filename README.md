@@ -1,8 +1,12 @@
 ## Overview
 
-The idea is simple: keep the things I use every day close at hand, without having to open a browser tab or launch another application.
+The idea is simple: keep the things you use every day close at hand, without having to open a browser tab or launch another application.
 
 The interface stays consistent and fluid, while remaining out of the way when not in use. Everything is integrated directly into edge bars and floating panels. Why not have something that is practical and yet beautiful?
+
+<div align="center">
+    <img src="./demo/demo.mp4" alt="demo">
+</div>
 
 ## What's Inside
 
