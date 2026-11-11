@@ -1,8 +1,9 @@
 // ============================================================================
 // File: components/service-parsers.js
 // Purpose: Pure, stateless parsing and formatting helpers for Weather
-//          (Open-Meteo JSON & WMO weather codes), Audio (wpctl output), and
-//          Workspaces (Niri JSON & collapsed strip filtering).
+//          (Open-Meteo JSON & WMO weather codes), Audio (wpctl output),
+//          Workspaces (Niri JSON & collapsed strip filtering), Processes,
+//          and Menu launch history and sorting.
 //          Extracted as a stateless JS library (.pragma library) so both
 //          Quickshell service modules and Qt Quick Test cases (qmltestrunner)
 //          can execute and verify them without Quickshell I/O.
@@ -744,6 +745,165 @@ function filterAndSortProcesses(processes, filterText, sortBy, sortDescending) {
 
     return filtered
 }
+
+/**
+ * Parse raw history text lines (format: "<name>:<count>") into a dictionary of { [name]: count }.
+ */
+function parseMenuHistory(text) {
+    var counts = {}
+    if (!text || typeof text !== "string") return counts
+    var lines = text.split("\n")
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim()
+        if (!line) continue
+        var lastColon = line.lastIndexOf(":")
+        if (lastColon > 0) {
+            var key = line.substring(0, lastColon).trim()
+            var cnt = parseInt(line.substring(lastColon + 1).trim(), 10)
+            if (key && !isNaN(cnt)) {
+                counts[key] = cnt
+            }
+        }
+    }
+    return counts
+}
+
+/**
+ * Return launch usage count for a given name from a history count map, checking case-insensitively as fallback.
+ */
+function getMenuHistoryUsage(historyMap, name) {
+    if (!historyMap || !name) return 0
+    if (typeof historyMap[name] === "number") return historyMap[name]
+    var lower = String(name).toLowerCase()
+    if (typeof historyMap[lower] === "number") return historyMap[lower]
+    return 0
+}
+
+/**
+ * Pure filter and sort function for applications.
+ * - Filters by query (if provided).
+ * - When sortOption === "most used": sorts by usage count descending; if counts are equal (or 0), sorts alphabetically.
+ * - When sortOption === "alphabetically": sorts alphabetically (with query prefix match priority if query present).
+ */
+function filterAndSortApps(allApps, searchQuery, sortOption, historyMap) {
+    var src = allApps || []
+    var q = (searchQuery || "").trim().toLowerCase()
+    var filtered = []
+
+    if (!q) {
+        filtered = src.slice()
+    } else {
+        for (var i = 0; i < src.length; i++) {
+            var app = src[i]
+            var name = (app.name || "").toLowerCase()
+            var comment = (app.comment || "").toLowerCase()
+            var gen = (app.genericName || "").toLowerCase()
+            if (name.indexOf(q) !== -1 || comment.indexOf(q) !== -1 || gen.indexOf(q) !== -1) {
+                filtered.push(app)
+            }
+        }
+    }
+
+    var isMostUsed = (sortOption === "most used")
+
+    filtered.sort(function(a, b) {
+        var nameA = a.name || ""
+        var nameB = b.name || ""
+
+        if (q) {
+            var aStarts = nameA.toLowerCase().indexOf(q) === 0
+            var bStarts = nameB.toLowerCase().indexOf(q) === 0
+            if (aStarts !== bStarts) return aStarts ? -1 : 1
+        }
+
+        if (isMostUsed) {
+            var countA = getMenuHistoryUsage(historyMap, nameA)
+            var countB = getMenuHistoryUsage(historyMap, nameB)
+            if (countB !== countA) return countB - countA
+        }
+
+        return nameA.localeCompare(nameB)
+    })
+
+    return filtered
+}
+
+/**
+ * Pure filter and sort function for commands.
+ * - If query present and not empty, optionally prefixes custom exec command.
+ * - When sortOption === "most used": sorts by usage count descending; if counts equal, alphabetically.
+ * - When sortOption === "alphabetically": sorts alphabetically.
+ */
+function filterAndSortCommands(allCommands, searchQuery, sortOption, historyMap) {
+    var src = allCommands || []
+    var raw = (searchQuery || "").trim()
+    var q = raw.toLowerCase()
+    var list = []
+
+    if (raw.length > 0) {
+        list.push({
+            name: raw,
+            desc: "Run with zsh: " + raw,
+            type: "exec",
+            isCustomExec: true
+        })
+    }
+
+    if (src.length === 0) {
+        return list
+    }
+
+    var isMostUsed = (sortOption === "most used")
+
+    function compareCmds(a, b) {
+        var nameA = a.name || ""
+        var nameB = b.name || ""
+        if (isMostUsed) {
+            var countA = getMenuHistoryUsage(historyMap, nameA)
+            var countB = getMenuHistoryUsage(historyMap, nameB)
+            if (countB !== countA) return countB - countA
+        }
+        return nameA.localeCompare(nameB)
+    }
+
+    if (!q) {
+        var sortedAll = src.slice()
+        sortedAll.sort(compareCmds)
+        for (var i = 0; i < sortedAll.length && list.length < 50; i++) {
+            list.push(sortedAll[i])
+        }
+    } else {
+        var exactMatches = []
+        var prefixMatches = []
+        var containsMatches = []
+        for (var j = 0; j < src.length; j++) {
+            var c = src[j]
+            var cName = (c.name || "").toLowerCase()
+            if (cName === q) {
+                exactMatches.push(c)
+            } else if (cName.indexOf(q) === 0) {
+                prefixMatches.push(c)
+            } else if (cName.indexOf(q) !== -1 || (c.desc && c.desc.toLowerCase().indexOf(q) !== -1)) {
+                containsMatches.push(c)
+            }
+        }
+
+        exactMatches.sort(compareCmds)
+        prefixMatches.sort(compareCmds)
+        containsMatches.sort(compareCmds)
+
+        var combined = exactMatches.concat(prefixMatches).concat(containsMatches)
+        for (var k = 0; k < combined.length && list.length < 50; k++) {
+            if (list.length > 0 && list[0].isCustomExec && (list[0].name || "").toLowerCase() === (combined[k].name || "").toLowerCase()) {
+                continue
+            }
+            list.push(combined[k])
+        }
+    }
+
+    return list
+}
+
 
 
 

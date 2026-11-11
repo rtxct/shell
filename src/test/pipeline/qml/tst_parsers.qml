@@ -294,5 +294,46 @@ TestCase {
         compare(ServiceParsers.parseCavaFrame("0;250;500;750;1000;", 4, 1000), null)
         compare(ServiceParsers.parseCavaFrame("0;abc;500;1000;", 4, 1000), null)
     }
+
+    function test_menu_history_parsing_and_sorting() {
+        var rawHist = "firefox:10\r\nalacritty:5\ncode:2\n"
+        var parsed = ServiceParsers.parseMenuHistory(rawHist)
+        compare(parsed["firefox"], 10)
+        compare(parsed["alacritty"], 5)
+        compare(parsed["code"], 2)
+        compare(parsed["unknown"], undefined)
+
+        var apps = [
+            { name: "Code" },
+            { name: "Alacritty" },
+            { name: "Firefox" },
+            { name: "Zathura" },
+            { name: "GIMP" }
+        ]
+
+        // Alphabetical sort (default)
+        var alphaSorted = ServiceParsers.filterAndSortApps(apps, "", "alphabetically", parsed)
+        compare(alphaSorted.length, 5)
+        compare(alphaSorted[0].name, "Alacritty")
+        compare(alphaSorted[1].name, "Code")
+        compare(alphaSorted[2].name, "Firefox")
+        compare(alphaSorted[3].name, "GIMP")
+        compare(alphaSorted[4].name, "Zathura")
+
+        // Most used sort
+        // Expected order: Firefox (10), Alacritty (5), Code (2), then 0-use alphabetically: GIMP, Zathura
+        var mostUsedSorted = ServiceParsers.filterAndSortApps(apps, "", "most used", parsed)
+        compare(mostUsedSorted.length, 5)
+        compare(mostUsedSorted[0].name, "Firefox")
+        compare(mostUsedSorted[1].name, "Alacritty")
+        compare(mostUsedSorted[2].name, "Code")
+        compare(mostUsedSorted[3].name, "GIMP")
+        compare(mostUsedSorted[4].name, "Zathura")
+
+        // Most used sort with search query "z"
+        var querySorted = ServiceParsers.filterAndSortApps(apps, "z", "most used", parsed)
+        compare(querySorted.length, 1)
+        compare(querySorted[0].name, "Zathura")
+    }
 }
 
