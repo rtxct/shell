@@ -48,7 +48,7 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 | :--- | :---: | :--- |
 | **App Launcher** | *(none)* | Fast search for installed desktop applications. Features persistent sorting modes (**Alphabetical** vs. **Most Used** via launch frequency tracking), a live cache storage monitor with a one-click prune action, and immediate top-item selection on open for instant `Enter` key launching. |
 | **Command Runner** | `>` | Search system `$PATH` binaries and execute commands via your active `$SHELL` (with **Bash**, **Zsh**, and **Fish** aliases, builtins, and functions supported), with command history tracking, persistent sorting, and prune support. |
-| **Clipboard History** | `\` | Search clipboard history (`cliphist`) with preview, quick copy to clipboard, and item deletion. |
+| **Clipboard History** | `\` | Search clipboard history (`cliphist`) with preview, quick copy to clipboard. |
 | **Utilities** | *(none)* | Built-in screenshot capture triggers and screen color picker. |
 
 ### Notification Center
@@ -136,16 +136,7 @@ Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**
 | [`layout.config.json`](./config/layout.config.json) | Bar thickness, gaps, margins, and placement coordinates. |
 | [`wallpaper.config.json`](./config/wallpaper.config.json) | Fallback wallpaper path for the screen locker. |
 
-## Testing
-
-Headless automated pipeline checks: Python tests, config schemas, QML component tests, and linters.
-
-```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
-PATH=$PWD/.venv/bin:$PATH make test
-```
-
-## Buy Me A Coffee
+## Buy me a coffee
 <a href="https://buymeacoffee.com/rtxct">
     <img src="https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-black.svg"
          alt="Buy Me a Coffee"
