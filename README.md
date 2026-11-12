@@ -5,7 +5,7 @@ The idea is simple: keep the things you use every day close at hand, without hav
 The interface stays consistent and fluid, while remaining out of the way when not in use. Everything is integrated directly into edge bars and floating panels. Why not have something that is practical and yet beautiful?
 
 
-https://github.com/user-attachments/assets/b090bb4c-841e-4e0b-80a9-4bceee3389bc
+https://github.com/user-attachments/assets/c84c8a68-f76d-4cd6-954a-f784688a8d30
 
 
 ## What's Inside
