@@ -44,11 +44,12 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 ### Bottom-Left Corner: App Menu & Clipboard
 
-| Feature | Description |
-| :--- | :--- |
-| **App Launcher** | Fast search for desktop applications and terminal commands. Features persistent sorting modes (**Alphabetical** vs. **Most Used** via launch frequency tracking), a live cache storage monitor with a one-click prune action, and immediate top-item selection on open for instant `Enter` key launching. |
-| **Clipboard** | Searchable clipboard history manager with quick copy and item removal. |
-| **Utilities** | Built-in screenshot capture triggers and screen color picker. |
+| Feature | Operator | Description |
+| :--- | :---: | :--- |
+| **App Launcher** | *(none)* | Fast search for installed desktop applications. Features persistent sorting modes (**Alphabetical** vs. **Most Used** via launch frequency tracking), a live cache storage monitor with a one-click prune action, and immediate top-item selection on open for instant `Enter` key launching. |
+| **Command Runner** | `>` | Search system `$PATH` binaries and execute arbitrary terminal commands directly via `zsh`, with command history tracking, persistent sorting, and prune support. |
+| **Clipboard History** | `\` | Search clipboard history (`cliphist`) with preview, quick copy to clipboard, and item deletion. |
+| **Utilities** | *(none)* | Built-in screenshot capture triggers and screen color picker. |
 
 ### Notification Center
 
