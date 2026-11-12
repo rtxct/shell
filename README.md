@@ -4,9 +4,9 @@ The idea is simple: keep the things you use every day close at hand, without hav
 
 The interface stays consistent and fluid, while remaining out of the way when not in use. Everything is integrated directly into edge bars and floating panels. Why not have something that is practical and yet beautiful?
 
-<div align="center">
-    <video src="https://github.com/rtxct/shell/blob/master/demo/demo.mp4" controls width="800"></video>
-</div>
+
+https://github.com/user-attachments/assets/b090bb4c-841e-4e0b-80a9-4bceee3389bc
+
 
 ## What's Inside
 
