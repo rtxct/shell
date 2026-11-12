@@ -42,7 +42,7 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 | **Battery Diagnostics** | Real-time percentage, time to empty/full, health, cycle count |
 | **Session Actions** | Quick triggers for Reboot, Power Off, Sleep, and Lock |
 
-**Bottom-Left Corner: App Menu & Clipboard**
+## Bottom-Left Corner: App Menu & Clipboard
 
 | Feature | Description |
 | :--- | :--- |

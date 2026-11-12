@@ -285,6 +285,7 @@ Item {
     }
 
     function endDrag() {
+        isDraggingAny = false
         if (!currentDragSlot) return
         currentDragSlot.isDragging = false
         if (currentDragSlot.nearDockZone) {
@@ -305,7 +306,6 @@ Item {
         currentDragSlot.nearDockZone = false
         currentDragSlot = null
         hasLeftDockZone = false
-        isDraggingAny = false
     }
 
     // ── Open directly as floating window ──
@@ -343,25 +343,35 @@ Item {
     }
 
     function closeWindow(winId) {
+        if (currentDragSlot && currentDragSlot.winId === winId) {
+            endDrag()
+        }
         var slot = findSlot(winId)
         if (slot) {
             slot.active = false
+            slot.isDragging = false
             root.windowClosed(winId)
         }
     }
 
     function dockWindow(winId) {
+        if (currentDragSlot && currentDragSlot.winId === winId) {
+            endDrag()
+        }
         var slot = findSlot(winId)
         if (slot) {
             slot.active = false
+            slot.isDragging = false
             root.windowDocked(winId)
         }
     }
 
     function closeAll() {
+        endDrag()
         for (var i = 0; i < slots.length; i++) {
             if (slots[i].active) {
                 slots[i].active = false
+                slots[i].isDragging = false
                 root.windowClosed(slots[i].winId)
             }
         }
@@ -417,10 +427,10 @@ Item {
         onCloseRequested: function(id) { root.closeWindow(id) }
     }
 
-    // Flag for optional fullscreen drag overlay mask (off by default).
-    // Wayland implicit pointer grabs deliver motion events to the origin surface
-    // until button release, so a full-screen mask is unnecessary under standard compositors.
-    property bool enableDragOverlayMask: false
+    // Flag for fullscreen drag overlay mask on qs-floating.
+    // When any floating window slot is being dragged/moved, this ensures qs-floating
+    // maintains a full-screen input region so cursor events are never clipped by Wayland.
+    property bool enableDragOverlayMask: true
 
     readonly property Item dragOverlayMask: dragOverlay
     Item {

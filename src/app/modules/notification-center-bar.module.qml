@@ -313,6 +313,13 @@ Item {
                         }
                     }
                 }
+
+                onCanceled: {
+                    if (notifDrop.isDetaching) {
+                        notifDrop.isDetaching = false
+                        if (root.floatManager) root.floatManager.endDrag()
+                    }
+                }
             }
         }
 

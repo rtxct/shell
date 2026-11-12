@@ -156,6 +156,7 @@ Scope {
         || (scope.isLeftmostScreen && scope.isBottommostScreen && appMenu && appMenu.isActivelyDetaching)
         || (scope.isTopmostScreen && ((topLeft && topLeft.isDetaching) || (topRight && topRight.isDetaching) || (middleBar && middleBar.isActivelyDetaching)))
         || (scope.isLeftmostScreen && ((wsIsland && wsIsland.isActivelyDetaching) || cu0.isDetaching || cu1.isDetaching || cu2.isDetaching || cd2.isDetaching || cd1.isDetaching || cd0.isDetaching))
+        || (scope.isRightmostScreen && scope.isBottommostScreen && mediaControlBar && mediaControlBar.isActivelyDetaching)
 
     readonly property bool localClickOpen: (scope.isTopmostScreen && ctlTop.clickOpen)
         || (scope.isLeftmostScreen && ctlLeft.clickOpen)
@@ -336,7 +337,7 @@ Scope {
                 id: catcher
                 anchors.fill: parent
                 enabled: scope.anyClickOpen
-                visible: scope.anyClickOpen
+                visible: scope.anyClickOpen || (floatManager && floatManager.isDraggingAny)
                 z: -1
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                 onPressed: scope.closeAll()
@@ -499,14 +500,14 @@ Scope {
         visible: floatManager ? floatManager.layerVisible : false
 
         mask: Region {
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw0 && floatManager.fw0.active) ? floatManager.fw0 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw1 && floatManager.fw1.active) ? floatManager.fw1 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw2 && floatManager.fw2.active) ? floatManager.fw2 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw3 && floatManager.fw3.active) ? floatManager.fw3 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw4 && floatManager.fw4.active) ? floatManager.fw4 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw5 && floatManager.fw5.active) ? floatManager.fw5 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw6 && floatManager.fw6.active) ? floatManager.fw6 : null }
-            Region { item: (floatManager && !floatManager.isDraggingAny && floatManager.fw7 && floatManager.fw7.active) ? floatManager.fw7 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw0) && floatManager.fw0 && floatManager.fw0.active) ? floatManager.fw0 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw1) && floatManager.fw1 && floatManager.fw1.active) ? floatManager.fw1 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw2) && floatManager.fw2 && floatManager.fw2.active) ? floatManager.fw2 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw3) && floatManager.fw3 && floatManager.fw3.active) ? floatManager.fw3 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw4) && floatManager.fw4 && floatManager.fw4.active) ? floatManager.fw4 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw5) && floatManager.fw5 && floatManager.fw5.active) ? floatManager.fw5 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw6) && floatManager.fw6 && floatManager.fw6.active) ? floatManager.fw6 : null }
+            Region { item: (floatManager && (!floatManager.isDraggingAny || floatManager.currentDragSlot !== floatManager.fw7) && floatManager.fw7 && floatManager.fw7.active) ? floatManager.fw7 : null }
             Region { item: (floatManager && floatManager.enableDragOverlayMask) ? floatManager.dragOverlayMask : null }
         }
 

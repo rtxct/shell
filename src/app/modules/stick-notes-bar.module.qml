@@ -469,6 +469,13 @@ Item {
                                 noteDrawerItem.finishDetach()
                             }
                         }
+
+                        onCanceled: {
+                            if (isDetachingDrawer) {
+                                isDetachingDrawer = false
+                                noteDrawerItem.finishDetach()
+                            }
+                        }
                     }
 
                     // ── A. CLOSED TAB (when idle) ──
@@ -527,6 +534,13 @@ Item {
                                 } else {
                                     root.creatingNew = false
                                     root.activeDrawerId = modelData.id
+                                }
+                            }
+
+                            onCanceled: {
+                                if (closedTab.isDetaching) {
+                                    closedTab.isDetaching = false
+                                    noteDrawerItem.finishDetach()
                                 }
                             }
                         }
@@ -648,6 +662,13 @@ Item {
                                             noteDrawerItem.finishDetach()
                                         }
                                     }
+
+                                    onCanceled: {
+                                        if (isDetachingHeader) {
+                                            isDetachingHeader = false
+                                            noteDrawerItem.finishDetach()
+                                        }
+                                    }
                                 }
 
                                 Row {
@@ -722,6 +743,13 @@ Item {
                                             openContent.selectedNoteIndex = -1
                                             openContent.editingSelectedNote = false
                                             openContent.pickingColor = true
+                                        }
+                                    }
+
+                                    onCanceled: {
+                                        if (isDetachingHeader) {
+                                            isDetachingHeader = false
+                                            noteDrawerItem.finishDetach()
                                         }
                                     }
                                 }
@@ -824,6 +852,13 @@ Item {
                                         } else {
                                             openContent.addingItem = !openContent.addingItem
                                             if (openContent.addingItem) itemInput.forceActiveFocus()
+                                        }
+                                    }
+
+                                    onCanceled: {
+                                        if (isDetachingAdd) {
+                                            isDetachingAdd = false
+                                            noteDrawerItem.finishDetach()
                                         }
                                     }
                                 }

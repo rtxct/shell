@@ -253,6 +253,13 @@ Item {
                     root.appButtonClicked()
                 }
             }
+
+            onCanceled: {
+                if (dropBtn.isDetaching) {
+                    dropBtn.isDetaching = false
+                    if (root.floatManager) root.floatManager.endDrag()
+                }
+            }
         }
     }
 
