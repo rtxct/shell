@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Command Manager for Quickshell.
-
-Discovers system executables in PATH, zsh aliases, builtins, and functions,
-and executes commands via zsh with optional terminal emulator wrapper.
+"""File: scripts/commands/command-manager.py
+Purpose: Discovers system executables in PATH, bash aliases, builtins, and functions,
+and executes commands via bash with optional terminal emulator wrapper.
+Public API:
+  - list: Outputs JSON array of discovered commands, aliases, and builtins.
+  - run <cmd>: Executes a command with bash or inside a detected terminal emulator.
+  - refresh: Rebuilds the commands cache file.
+Dependencies: json, os, pathlib, shutil, subprocess, sys, time
 """
 
 from __future__ import annotations
@@ -16,7 +20,7 @@ import time
 from pathlib import Path
 
 CACHE_DIR = Path.home() / ".cache" / "quickshell"
-CACHE_FILE = CACHE_DIR / "zsh_commands_cache.json"
+CACHE_FILE = CACHE_DIR / "commands_cache.json"
 CACHE_TTL = 3600  # 1 hour
 
 INTERACTIVE_CLI_TOOLS = {
@@ -77,10 +81,10 @@ def get_path_executables() -> dict[str, str]:
     return commands
 
 
-def get_zsh_aliases() -> dict[str, str]:
+def get_bash_aliases() -> dict[str, str]:
     try:
         proc = subprocess.run(
-            ["zsh", "-i", "-c", "alias"],
+            ["bash", "-i", "-c", "alias -p"],
             capture_output=True,
             text=True,
             timeout=3,
@@ -89,6 +93,9 @@ def get_zsh_aliases() -> dict[str, str]:
             return {}
         aliases: dict[str, str] = {}
         for line in proc.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("alias "):
+                line = line[6:]
             if "=" in line:
                 name, val = line.split("=", 1)
                 aliases[name.strip()] = val.strip().strip("'\"")
@@ -97,10 +104,10 @@ def get_zsh_aliases() -> dict[str, str]:
         return {}
 
 
-def get_zsh_builtins() -> set[str]:
+def get_bash_builtins() -> set[str]:
     try:
         proc = subprocess.run(
-            ["zsh", "-c", "print -l ${(k)builtins}"],
+            ["bash", "-c", "compgen -b"],
             capture_output=True,
             text=True,
             timeout=1,
@@ -115,8 +122,8 @@ def get_zsh_builtins() -> set[str]:
 def build_command_cache() -> list[dict[str, str]]:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-    aliases = get_zsh_aliases()
-    builtins = get_zsh_builtins()
+    aliases = get_bash_aliases()
+    builtins = get_bash_builtins()
     path_execs = get_path_executables()
 
     items: list[dict[str, str]] = []
@@ -139,7 +146,7 @@ def build_command_cache() -> list[dict[str, str]]:
             items.append(
                 {
                     "name": b,
-                    "desc": "zsh builtin command",
+                    "desc": "bash builtin command",
                     "type": "builtin",
                 }
             )
@@ -192,28 +199,28 @@ def execute_command(cmd: str) -> bool:
     if is_cli and term:
         if term == "foot":
             subprocess.Popen(
-                ["foot", "zsh", "-i", "-c", f"{cmd}; exec zsh"],
+                ["foot", "bash", "-i", "-c", f"{cmd}; exec bash"],
                 start_new_session=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
         elif term == "kitty":
             subprocess.Popen(
-                ["kitty", "zsh", "-i", "-c", f"{cmd}; exec zsh"],
+                ["kitty", "bash", "-i", "-c", f"{cmd}; exec bash"],
                 start_new_session=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
         else:
             subprocess.Popen(
-                [term, "-e", "zsh", "-i", "-c", f"{cmd}; exec zsh"],
+                [term, "-e", "bash", "-i", "-c", f"{cmd}; exec bash"],
                 start_new_session=True,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
     else:
         subprocess.Popen(
-            ["zsh", "-i", "-c", cmd],
+            ["bash", "-i", "-c", cmd],
             start_new_session=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,

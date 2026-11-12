@@ -843,7 +843,7 @@ function filterAndSortCommands(allCommands, searchQuery, sortOption, historyMap)
     if (raw.length > 0) {
         list.push({
             name: raw,
-            desc: "Run with zsh: " + raw,
+            desc: "Run with bash: " + raw,
             type: "exec",
             isCustomExec: true
         })
