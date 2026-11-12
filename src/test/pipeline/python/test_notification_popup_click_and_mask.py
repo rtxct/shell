@@ -86,3 +86,16 @@ def test_notification_service_activates_default_action_and_focus_window():
 
     # Verify focus-notification-app script is invoked
     assert "focus-notification-app.sh" in service_content
+
+
+def test_notification_service_never_stores_dangling_qobject_refs():
+    service_content = NOTIFICATIONS_SERVICE.read_text(encoding="utf-8")
+
+    # Verify notificationRef is never stored in history items
+    assert "notificationRef:" not in service_content
+    assert "it.notificationRef" not in service_content
+    assert "itemOrNotif.notificationRef" not in service_content
+
+    # Verify findLiveNotification helper looks up from trackedNotifications safely
+    assert "function findLiveNotification(id)" in service_content
+    assert "root.server.trackedNotifications.values" in service_content

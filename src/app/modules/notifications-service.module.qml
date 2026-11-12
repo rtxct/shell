@@ -4,7 +4,7 @@
 // Public API:
 //   - Properties: muted, history, defaultTimeoutMs, criticalTimeoutMs, maxVisibleCount, server
 //   - Signals:    notificationReceived(var notification), cleared()
-//   - Functions:  applyConfig(text), toggleMute(), clearAll(), removeById(id)
+//   - Functions:  applyConfig(text), toggleMute(), clearAll(), removeById(id), removeGroupByOrigin(originKey), findLiveNotification(id), activateNotification(itemOrNotif)
 // Dependencies: Quickshell, Quickshell.Io, Quickshell.Services.Notifications, QtQuick
 // ============================================================================
 import Quickshell
@@ -90,15 +90,28 @@ Item {
         root.cleared()
     }
 
+    function findLiveNotification(id) {
+        if (!root.server || !root.server.trackedNotifications) return null
+        var list = root.server.trackedNotifications.values
+        if (!list) return null
+        for (var i = 0; i < list.length; i++) {
+            var n = list[i]
+            if (n && n.id === id) {
+                return n
+            }
+        }
+        return null
+    }
+
     function removeById(id) {
+        var live = root.findLiveNotification(id)
+        if (live) {
+            try { live.dismiss() } catch (e) {}
+        }
         var list = []
         for (var i = 0; i < root.history.length; i++) {
             var it = root.history[i]
-            if (it.id === id) {
-                if (it.notificationRef) {
-                    try { it.notificationRef.dismiss() } catch (e) {}
-                }
-            } else {
+            if (it.id !== id) {
                 list.push(it)
             }
         }
@@ -112,8 +125,9 @@ Item {
             var it = root.history[i]
             var key = it.originKey || (it.appName || it.desktopEntry || it.appIcon || "Notification").toLowerCase()
             if (key === target) {
-                if (it.notificationRef) {
-                    try { it.notificationRef.dismiss() } catch (e) {}
+                var live = root.findLiveNotification(it.id)
+                if (live) {
+                    try { live.dismiss() } catch (e) {}
                 }
             } else {
                 list.push(it)
@@ -128,7 +142,13 @@ Item {
 
     function activateNotification(itemOrNotif) {
         if (!itemOrNotif) return
-        var notifObj = itemOrNotif.notificationRef ? itemOrNotif.notificationRef : itemOrNotif
+        var notifObj = null
+        if (itemOrNotif.actions !== undefined) {
+            notifObj = itemOrNotif
+        } else if (itemOrNotif.id !== undefined) {
+            notifObj = root.findLiveNotification(itemOrNotif.id)
+        }
+
         if (notifObj && notifObj.actions) {
             var acts = notifObj.actions
             var count = (typeof acts.length === "number") ? acts.length : (acts.count !== undefined ? acts.count : 0)
@@ -191,8 +211,7 @@ Item {
                 image: notification.image || "",
                 originKey: String(rawOrigin).toLowerCase(),
                 urgency: (notification.urgency !== undefined) ? notification.urgency : 1,
-                time: new Date(),
-                notificationRef: notification
+                time: new Date()
             }
             var list = root.history.slice(0)
             list.unshift(item)
