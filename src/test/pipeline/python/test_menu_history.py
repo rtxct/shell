@@ -176,10 +176,14 @@ def test_cli_subcommands(tmp_path: Path, capsys):
 
 def test_sort_option_persistence(tmp_path: Path):
     cache_dir = tmp_path / "quickshell-menu"
+    app_hist = cache_dir / "app.hist"
+    cmd_hist = cache_dir / "cmd.hist"
     sort_file = cache_dir / "sort.state"
 
     with (
         patch.object(hist_mod, "CACHE_DIR", cache_dir),
+        patch.object(hist_mod, "APP_HIST", app_hist),
+        patch.object(hist_mod, "CMD_HIST", cmd_hist),
         patch.object(hist_mod, "SORT_FILE", sort_file),
     ):
         # Default when missing

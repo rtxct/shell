@@ -44,9 +44,10 @@ def load_sort_option() -> str:
 
 
 def save_sort_option(opt: str) -> None:
-    ensure_cache_files()
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
     val = opt if opt in ("alphabetically", "most used") else "alphabetically"
     try:
+        SORT_FILE.parent.mkdir(parents=True, exist_ok=True)
         SORT_FILE.write_text(val + "\n", encoding="utf-8")
     except OSError as err:
         sys.stderr.write(f"Error writing {SORT_FILE}: {err}\n")
@@ -55,11 +56,14 @@ def save_sort_option(opt: str) -> None:
 def ensure_cache_files() -> None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     if not APP_HIST.exists():
+        APP_HIST.parent.mkdir(parents=True, exist_ok=True)
         APP_HIST.touch()
     if not CMD_HIST.exists():
+        CMD_HIST.parent.mkdir(parents=True, exist_ok=True)
         CMD_HIST.touch()
     if not SORT_FILE.exists():
         try:
+            SORT_FILE.parent.mkdir(parents=True, exist_ok=True)
             SORT_FILE.write_text("alphabetically\n", encoding="utf-8")
         except OSError:
             pass
