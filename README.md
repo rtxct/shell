@@ -46,9 +46,9 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 
 | Feature | Description |
 | :--- | :--- |
-| **App Launcher** | Application search |
-| **Clipboard** | Clipboard history |
-| **Utilities** | Screenshots and color picker |
+| **App Launcher** | Fast search for desktop applications and terminal commands. Features persistent sorting modes (**Alphabetical** vs. **Most Used** via launch frequency tracking), a live cache storage monitor with a one-click prune action, and immediate top-item selection on open for instant `Enter` key launching. |
+| **Clipboard** | Searchable clipboard history manager with quick copy and item removal. |
+| **Utilities** | Built-in screenshot capture triggers and screen color picker. |
 
 ### Notification Center
 
