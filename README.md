@@ -144,3 +144,10 @@ Headless automated pipeline checks: Python tests, config schemas, QML component 
 python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 PATH=$PWD/.venv/bin:$PATH make test
 ```
+
+## Buy Me A Coffee
+<a href="https://buymeacoffee.com/rtxct">
+    <img src="https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-black.svg"
+         alt="Buy Me a Coffee"
+         width="200">
+</a>
