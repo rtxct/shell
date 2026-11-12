@@ -34,13 +34,13 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 | **Bluetooth** | Device discovery, pairing, battery indicators, connect/disconnect toggles |
 | **Night Light** | Gamma temperature controls, toggle, coordinate adjustments |
 
-**#Bottom Circles: Power & Battery**
+**Bottom Circles: Power & Battery**
 
-| #Control | Features |
-| #:--- | :--- |
-| #**Power Profiles** | Quick toggle between Performance, Balanced, and Power Saver |
-| #**Battery Diagnostics** | Real-time percentage, time to empty/full, health, cycle count |
-| #**Session Actions** | Quick triggers for Reboot, Power Off, Sleep, and Lock |
+| Control | Features |
+| :--- | :--- |
+| **Power Profiles** | Quick toggle between Performance, Balanced, and Power Saver |
+| **Battery Diagnostics** | Real-time percentage, time to empty/full, health, cycle count |
+| **Session Actions** | Quick triggers for Reboot, Power Off, Sleep, and Lock |
 
 ### Bottom-Left Corner: App Menu & Clipboard
 
