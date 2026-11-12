@@ -806,7 +806,7 @@ Item {
                             clip: true
 
                             Text {
-                                text: root.isClipboardMode ? "    Search clipboard history…" : (root.isCommandMode ? "    Type a command to execute with bash…" : "Search applications…")
+                                text: root.isClipboardMode ? "    Search clipboard history…" : (root.isCommandMode ? "    Type a command to execute…" : "Search applications…")
                                 color: AppMenuStyle.textPlaceholder
                                 font.pixelSize: AppMenuStyle.searchInputFontPx
                                 visible: (!searchInput.text && !searchInput.activeFocus) || (root.isCommandMode && searchInput.text === ">") || (root.isClipboardMode && searchInput.text === "\\")

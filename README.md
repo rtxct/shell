@@ -47,7 +47,7 @@ Central workspace indicators (supports both `sway` and `niri`) that expand into 
 | Feature | Operator | Description |
 | :--- | :---: | :--- |
 | **App Launcher** | *(none)* | Fast search for installed desktop applications. Features persistent sorting modes (**Alphabetical** vs. **Most Used** via launch frequency tracking), a live cache storage monitor with a one-click prune action, and immediate top-item selection on open for instant `Enter` key launching. |
-| **Command Runner** | `>` | Search system `$PATH` binaries and execute arbitrary terminal commands directly via `bash`, with command history tracking, persistent sorting, and prune support. |
+| **Command Runner** | `>` | Search system `$PATH` binaries and execute commands via your active `$SHELL` (with **Bash**, **Zsh**, and **Fish** aliases, builtins, and functions supported), with command history tracking, persistent sorting, and prune support. |
 | **Clipboard History** | `\` | Search clipboard history (`cliphist`) with preview, quick copy to clipboard, and item deletion. |
 | **Utilities** | *(none)* | Built-in screenshot capture triggers and screen color picker. |
 
