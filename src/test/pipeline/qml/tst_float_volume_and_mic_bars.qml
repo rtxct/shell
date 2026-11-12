@@ -35,6 +35,8 @@ Item {
         signal windowDocked(string id)
         signal windowClosed(string id)
 
+        property int endDragCount: 0
+
         function startDrag(cfg, x, y) {
             lastDragConfig = cfg
             lastDragPt = Qt.point(x, y)
@@ -42,7 +44,9 @@ Item {
         function updateDrag(x, y) {
             lastDragPt = Qt.point(x, y)
         }
-        function endDrag() {}
+        function endDrag() {
+            endDragCount++
+        }
     }
 
     MediaControlBar {
@@ -174,6 +178,9 @@ Item {
         function test_volume_and_mic_buttons_vanish_when_floating_and_fade_in_when_returned() {
             mediaBar.closeMerged()
             compare(mediaBar.isMerged, false, "Initially not merged")
+            compare(mediaBar.circleVolumeRef.x, 0, "Volume circle starts at x=0")
+            compare(mediaBar.circleMicRef.x, mediaBar.circleSize + mediaBar.circleSpacing, "Mic circle starts at x=circleSize + circleSpacing")
+
             mockFloatManager.isVolumeBarFloating = true
             compare(mediaBar.isVolumeBarFloating, true, "isVolumeBarFloating tracks volume-bar floating state")
             mockFloatManager.isVolumeBarFloating = false
@@ -181,8 +188,58 @@ Item {
 
             mockFloatManager.isMicBarFloating = true
             compare(mediaBar.isMicBarFloating, true, "isMicBarFloating tracks mic-bar floating state")
+            tryCompare(mediaBar.circleVolumeRef, "x", mediaBar.circleSize + mediaBar.circleSpacing, 500)
             mockFloatManager.isMicBarFloating = false
             compare(mediaBar.isMicBarFloating, false, "Mic button returns when mic-bar is docked/closed")
+            tryCompare(mediaBar.circleVolumeRef, "x", 0, 500)
+        }
+
+        function test_media_detach_helpers_and_cancel() {
+            mediaBar.closeMerged()
+            mockFloatManager.isSoundFloating = false
+            mockFloatManager.lastDragConfig = null
+            mockFloatManager.endDragCount = 0
+
+            compare(mediaBar.isMediaDetaching, false, "Initially isMediaDetaching is false")
+            compare(mediaBar.isActivelyDetaching, false, "Initially isActivelyDetaching is false")
+
+            // Begin gesture
+            mediaBar.beginMediaDetach(100, 100)
+            compare(mediaBar.isMediaDetaching, false, "Not detaching before threshold")
+
+            // Move past detach threshold
+            var triggered = mediaBar.updateMediaDetach(100, 100 - (MediaControlBarStyle.detachThresholdY + 10))
+            compare(triggered, true, "updateMediaDetach triggers detach")
+            compare(mediaBar.isMediaDetaching, true, "isMediaDetaching is now true")
+            compare(mediaBar.isActivelyDetaching, true, "isActivelyDetaching is now true")
+            verify(mockFloatManager.lastDragConfig !== null, "startDrag called with config")
+            compare(mockFloatManager.lastDragConfig.id, "sound", "Detaching sound control panel")
+
+            // Simulate sound slot becoming floating as result of startDrag
+            mockFloatManager.isSoundFloating = true
+
+            // Subsequent mouse moves must NOT freeze or early-exit; they must call updateDrag
+            var moved = mediaBar.updateMediaDetach(120, 70)
+            compare(moved, true, "Subsequent drag updates must continue while detaching")
+            compare(mockFloatManager.lastDragPt, Qt.point(120, 70), "updateDrag called with updated coordinates")
+
+            // Cancel gesture
+            mediaBar.cancelMediaDetach()
+            compare(mediaBar.isMediaDetaching, false, "cancelMediaDetach resets isMediaDetaching")
+            compare(mediaBar.isActivelyDetaching, false, "isActivelyDetaching is reset")
+            compare(mockFloatManager.endDragCount, 1, "endDrag called on cancel")
+
+            // Window returns to dock
+            mockFloatManager.isSoundFloating = false
+
+            // Begin another gesture and end normally
+            mediaBar.beginMediaDetach(200, 200)
+            mediaBar.updateMediaDetach(200, 200 - (MediaControlBarStyle.detachThresholdY + 10))
+            compare(mediaBar.isMediaDetaching, true, "Detaching again")
+            var wasDetaching = mediaBar.endMediaDetach()
+            compare(wasDetaching, true, "endMediaDetach returns true when was detaching")
+            compare(mediaBar.isMediaDetaching, false, "isMediaDetaching is reset")
+            compare(mockFloatManager.endDragCount, 2, "endDrag called on normal end")
         }
     }
 }

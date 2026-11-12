@@ -2,8 +2,8 @@
 // File: modules/media-control-bar.module.qml
 // Purpose: Bottom-right media and volume controller with merging volume/mic circles and live PipeWire audio peak perimeter wave.
 // Public API:
-//   - Properties: audio, floatManager, fg, dim, accent, fill, danger, btnWidth, btnDepth, circleSize, circleSpacing, mergedMode ...
-//   - Functions:  openMerged(mode), closeMerged(), currentAudioIcon(), currentVolume(), currentRatio(), handleWheel(wheel)
+//   - Properties: audio, floatManager, fg, dim, accent, fill, danger, btnWidth, btnDepth, circleSize, circleSpacing, mergedMode, isActivelyDetaching ...
+//   - Functions:  openMerged(mode), closeMerged(), currentAudioIcon(), currentVolume(), currentRatio(), handleWheel(wheel), beginMediaDetach(sceneX, sceneY), updateMediaDetach(sceneX, sceneY), endMediaDetach(), cancelMediaDetach()
 // Dependencies: QtQuick, "../components", "../styles", "../theme", QtQuick.Shapes
 // ============================================================================
 import QtQuick
@@ -40,6 +40,8 @@ Item {
 
     readonly property alias borderVisualizerRef: borderVisualizer
     readonly property alias dropMediaRef: dropMedia
+    readonly property alias circleVolumeRef: circleVolume
+    readonly property alias circleMicRef: circleMic
 
     // ── Merged Audio Controller State ──
     // Mode: "" (unmerged: 2 buttons + media island)
@@ -47,6 +49,58 @@ Item {
     //       "input"  (merged horizontal microphone slider)
     property string mergedMode: ""
     readonly property bool isMerged: mergedMode !== ""
+
+    // ── Detach / Drag State ──
+    property real mediaPressSceneX: 0
+    property real mediaPressSceneY: 0
+    property bool isMediaDetaching: false
+    readonly property bool isActivelyDetaching: root.isMediaDetaching || circleVolume.isDetaching || circleMic.isDetaching
+
+    function beginMediaDetach(sceneX, sceneY) {
+        if (root.isSoundFloating) return
+        mediaPressSceneX = sceneX
+        mediaPressSceneY = sceneY
+        isMediaDetaching = false
+    }
+
+    function updateMediaDetach(sceneX, sceneY) {
+        if (!isMediaDetaching) {
+            if (root.isSoundFloating) return false
+            var dy = mediaPressSceneY - sceneY
+            var dx = sceneX - mediaPressSceneX
+            if (root.floatManager && (dy > MediaControlBarStyle.detachThresholdY || Math.hypot(dx, dy) > MediaControlBarStyle.detachThresholdHypot)) {
+                isMediaDetaching = true
+                root.closeMerged()
+                root.floatManager.startDrag({
+                    id: "sound",
+                    title: "Sound Control",
+                    icon: "󰕾",
+                    originSide: "bottom",
+                    originX: root.x,
+                    originY: root.y,
+                    width: MediaControlBarStyle.floatWidth,
+                    height: MediaControlBarStyle.floatHeight,
+                    audio: root.audio
+                }, sceneX, sceneY)
+            }
+        } else if (root.floatManager) {
+            root.floatManager.updateDrag(sceneX, sceneY)
+        }
+        return isMediaDetaching
+    }
+
+    function endMediaDetach() {
+        if (!isMediaDetaching) return false
+        isMediaDetaching = false
+        if (root.floatManager) root.floatManager.endDrag()
+        return true
+    }
+
+    function cancelMediaDetach() {
+        if (!isMediaDetaching) return
+        isMediaDetaching = false
+        if (root.floatManager) root.floatManager.endDrag()
+    }
 
     function openMerged(mode) {
         mergedMode = mode
@@ -145,13 +199,28 @@ Item {
     readonly property real floatedCirclesStartX: dropIdleX + (root.btnWidth - (root.circleSize * 2 + root.circleSpacing)) / 2
     readonly property real floatedSingleCircleX: dropIdleX + (root.btnWidth - root.circleSize) / 2
 
+    readonly property bool isMicGone: (root.isMicBarFloating || circleMic.isDetaching) && !volCircleMouse.isDetaching
+
+    readonly property real activeLeftX: {
+        if (root.isMerged || root.isActivelyDetaching) return 0
+        if (!root.isVolumeBarFloating && !circleVolume.isDetaching) return circleVolume.x
+        if (!root.isMicBarFloating && !circleMic.isDetaching) return circleMic.x
+        return dropMedia.x
+    }
+
+    readonly property real activeRightX: {
+        if (root.isMerged || root.isActivelyDetaching) return root.width
+        if (!root.isSoundFloating && !root.isMediaDetaching) return root.width
+        if (!root.isMicBarFloating && !circleMic.isDetaching) return circleMic.x + circleMic.width
+        if (!root.isVolumeBarFloating && !circleVolume.isDetaching) return circleVolume.x + circleVolume.width
+        return 0
+    }
+
     Item {
         id: barMask
-        x: (root.isSoundFloating && !root.isMerged && !dropDragArea.isDetaching) ? circleVolume.x : 0
+        x: root.activeLeftX
         y: 0
-        width: (root.isSoundFloating && !root.isMerged && !dropDragArea.isDetaching)
-               ? (circleMic.x + circleMic.width - circleVolume.x)
-               : root.width
+        width: Math.max(0, root.activeRightX - root.activeLeftX)
         height: root.height
     }
 
@@ -166,9 +235,10 @@ Item {
     // ────────────────────────────────────────────────────────────────
     Rectangle {
         id: circleVolume
-        x: (root.isSoundFloating && !root.isMerged)
-           ? (root.isMicBarFloating ? root.floatedSingleCircleX : root.floatedCirclesStartX)
-           : 0
+        x: root.isMerged ? 0
+           : ((root.isSoundFloating && !root.isMediaDetaching)
+              ? (root.isMicGone ? root.floatedSingleCircleX : root.floatedCirclesStartX)
+              : (root.isMicGone ? (root.circleSize + root.circleSpacing) : 0))
         anchors.verticalCenter: parent.verticalCenter
         width: root.circleSize
         height: root.circleSize
@@ -288,6 +358,13 @@ Item {
                 }
             }
 
+            onCanceled: {
+                if (circleVolume.isDetaching) {
+                    circleVolume.isDetaching = false
+                    if (root.floatManager) root.floatManager.endDrag()
+                }
+            }
+
             onWheel: function(wheel) {
                 if (root.audio) {
                     var step = root.wheelStep()
@@ -304,7 +381,7 @@ Item {
     Rectangle {
         id: circleMic
         x: root.isMerged ? 0
-           : (root.isSoundFloating
+           : ((root.isSoundFloating && !root.isMediaDetaching)
               ? (root.isVolumeBarFloating ? root.floatedSingleCircleX : (root.floatedCirclesStartX + root.circleSize + root.circleSpacing))
               : (root.circleSize + root.circleSpacing))
         anchors.verticalCenter: parent.verticalCenter
@@ -419,6 +496,13 @@ Item {
                     if (root.floatManager) root.floatManager.endDrag()
                 } else if (mouse.button === Qt.LeftButton) {
                     root.openMerged("input")
+                }
+            }
+
+            onCanceled: {
+                if (circleMic.isDetaching) {
+                    circleMic.isDetaching = false
+                    if (root.floatManager) root.floatManager.endDrag()
                 }
             }
 
@@ -820,7 +904,7 @@ Item {
         id: dropMedia
         fromBottom: true
         x: root.isMerged ? 0 : (root.circleSize * 2 + root.circleSpacing + MediaControlBarStyle.dropGap)
-        y: (root.isSoundFloating && !root.isMerged) ? (root.btnDepth + 2) : 0
+        y: (root.isSoundFloating && !root.isMerged && !root.isMediaDetaching) ? (root.btnDepth + 2) : 0
         width: root.isMerged ? root.width : root.btnWidth
         height: root.btnDepth
         fill: borderVisualizer.visualizerActive ? MediaControlBarStyle.dropActiveFillColor : root.fill
@@ -838,12 +922,12 @@ Item {
         Behavior on x { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
         Behavior on y { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
         Behavior on width { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
-        visible: y < (root.btnDepth + 1) || dropDragArea.isDetaching
-        enabled: !root.isSoundFloating || root.isMerged || dropDragArea.isDetaching
+        visible: y < (root.btnDepth + 1) || root.isMediaDetaching
+        enabled: !root.isSoundFloating || root.isMerged || root.isMediaDetaching
 
         readonly property bool audioPlaying: (root.audio && (root.audio.isPlaying || root.audio.hasAudio)) ? true : false
-        readonly property bool showNowPlaying: !root.isMerged && !root.isSoundFloating && audioPlaying && !mergedBarHover.hovered
-        readonly property bool showMediaControls: !root.isMerged && !root.isSoundFloating && (!audioPlaying || mergedBarHover.hovered)
+        readonly property bool showNowPlaying: !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && audioPlaying && !mergedBarHover.hovered
+        readonly property bool showMediaControls: !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && (!audioPlaying || mergedBarHover.hovered)
 
         // HoverHandler to detect hover over the audio bar (switches Now Playing -> Media Controls and manages merged unmerge timer)
         HoverHandler {
@@ -874,46 +958,24 @@ Item {
             id: dropDragArea
             anchors.fill: parent
             z: -1
-            property real pressSceneX: 0
-            property real pressSceneY: 0
-            property bool isDetaching: false
 
             onPressed: function(mouse) {
                 var pt = mapToItem(null, mouse.x, mouse.y)
-                pressSceneX = pt.x
-                pressSceneY = pt.y
-                isDetaching = false
+                root.beginMediaDetach(pt.x, pt.y)
             }
 
             onPositionChanged: function(mouse) {
                 if (!pressed) return
                 var pt = mapToItem(null, mouse.x, mouse.y)
-                var dy = pressSceneY - pt.y
-
-                if (!isDetaching && root.floatManager && (dy > MediaControlBarStyle.detachThresholdY || Math.hypot(pt.x - pressSceneX, dy) > MediaControlBarStyle.detachThresholdHypot)) {
-                    isDetaching = true
-                    root.closeMerged()
-                    root.floatManager.startDrag({
-                        id: "sound",
-                        title: "Sound Control",
-                        icon: "󰕾",
-                        originSide: "bottom",
-                        originX: root.x,
-                        originY: root.y,
-                        width: MediaControlBarStyle.floatWidth,
-                        height: MediaControlBarStyle.floatHeight,
-                        audio: root.audio
-                    }, pt.x, pt.y)
-                } else if (isDetaching && root.floatManager) {
-                    root.floatManager.updateDrag(pt.x, pt.y)
-                }
+                root.updateMediaDetach(pt.x, pt.y)
             }
 
             onReleased: {
-                if (isDetaching) {
-                    isDetaching = false
-                    if (root.floatManager) root.floatManager.endDrag()
-                }
+                root.endMediaDetach()
+            }
+
+            onCanceled: {
+                root.cancelMediaDetach()
             }
         }
 
@@ -923,7 +985,7 @@ Item {
             anchors.centerIn: parent
             width: Math.max(0, parent.width - MediaControlBarStyle.nowPlayingHorizontalPadding * 2)
             spacing: MediaControlBarStyle.nowPlayingSpacing
-            opacity: dropMedia.showNowPlaying ? 1.0 : 0.0
+            opacity: (dropMedia.showNowPlaying && !root.isMediaDetaching) ? 1.0 : 0.0
             visible: opacity > 0.01
             Behavior on opacity { NumberAnimation { duration: MediaControlBarStyle.mediaFadeDurationMs; easing.type: Easing.OutCubic } }
 
@@ -977,9 +1039,9 @@ Item {
             id: mediaControlsRow
             anchors.centerIn: parent
             spacing: MediaControlBarStyle.mediaControlSpacing
-            opacity: dropMedia.showMediaControls ? 1.0 : 0.0
-            enabled: dropMedia.showMediaControls
-            visible: opacity > 0.01
+            opacity: (dropMedia.showMediaControls || root.isMediaDetaching) ? 1.0 : 0.0
+            enabled: dropMedia.showMediaControls || root.isMediaDetaching
+            visible: opacity > 0.01 || root.isMediaDetaching
             Behavior on opacity { NumberAnimation { duration: MediaControlBarStyle.mediaFadeDurationMs; easing.type: Easing.OutCubic } }
 
             // Previous Track Button
@@ -1005,9 +1067,22 @@ Item {
                     anchors.margins: -MediaControlBarStyle.btnHitPadding
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.audio) root.audio.previous()
+                    onPressed: function(mouse) {
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.beginMediaDetach(pt.x, pt.y)
                     }
+                    onPositionChanged: function(mouse) {
+                        if (!pressed) return
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.updateMediaDetach(pt.x, pt.y)
+                    }
+                    onReleased: function(mouse) {
+                        if (root.endMediaDetach()) return
+                        if (containsMouse && mouse.button === Qt.LeftButton) {
+                            if (root.audio) root.audio.previous()
+                        }
+                    }
+                    onCanceled: root.cancelMediaDetach()
                 }
             }
 
@@ -1034,9 +1109,22 @@ Item {
                     anchors.margins: -MediaControlBarStyle.btnHitPadding
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.audio) root.audio.togglePlay()
+                    onPressed: function(mouse) {
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.beginMediaDetach(pt.x, pt.y)
                     }
+                    onPositionChanged: function(mouse) {
+                        if (!pressed) return
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.updateMediaDetach(pt.x, pt.y)
+                    }
+                    onReleased: function(mouse) {
+                        if (root.endMediaDetach()) return
+                        if (containsMouse && mouse.button === Qt.LeftButton) {
+                            if (root.audio) root.audio.togglePlay()
+                        }
+                    }
+                    onCanceled: root.cancelMediaDetach()
                 }
             }
 
@@ -1063,9 +1151,22 @@ Item {
                     anchors.margins: -MediaControlBarStyle.btnHitPadding
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (root.audio) root.audio.next()
+                    onPressed: function(mouse) {
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.beginMediaDetach(pt.x, pt.y)
                     }
+                    onPositionChanged: function(mouse) {
+                        if (!pressed) return
+                        var pt = mapToItem(null, mouse.x, mouse.y)
+                        root.updateMediaDetach(pt.x, pt.y)
+                    }
+                    onReleased: function(mouse) {
+                        if (root.endMediaDetach()) return
+                        if (containsMouse && mouse.button === Qt.LeftButton) {
+                            if (root.audio) root.audio.next()
+                        }
+                    }
+                    onCanceled: root.cancelMediaDetach()
                 }
             }
         }
@@ -1194,6 +1295,11 @@ Item {
                         if (pressed) updateFromMouse(mouse.x)
                     }
                     onReleased: {
+                        if (!mergedBarHover.hovered) {
+                            unmergeTimer.restart()
+                        }
+                    }
+                    onCanceled: {
                         if (!mergedBarHover.hovered) {
                             unmergeTimer.restart()
                         }
