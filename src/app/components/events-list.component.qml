@@ -185,7 +185,7 @@ ColumnLayout {
     function message() {
         if (!events) return ""
         if (events.status === "no-url")
-            return "No calendar connected. \n\n To sync your account paste your Google Calendar iCal secret into: \n\n ~/.config/quickshell/config/calendar.config.json \n\n Or create a new environment variable: \n\n QS_ICS_URL."
+            return "No calendar connected. \n\n To sync your account paste your Google Calendar iCal secret into: \n\n ~/.config/quickshell/config/calendar.config.json"
         if (events.status === "loading") return "Loading events…"
         if (events.status === "error") return "Couldn't fetch the calendar (check the URL and your network)."
         if (root.selectedDate !== null) {

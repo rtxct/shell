@@ -13,7 +13,7 @@ import "../components/ical-parser.js" as ICalParser
 import "../components/service-parsers.js" as ServiceParsers
 
 // Reads an .ics feed (Google Calendar "secret iCal address", or any file:// / https:// ics).
-// Configuration comes from config/calendar.config.json (or QS_ICS_URL env fallback).
+// Configuration comes from config/calendar.config.json.
 // Supports basic recurrence: DAILY / WEEKLY(+BYDAY) / MONTHLY(+BYMONTHDAY, 2TU, -1FR) / YEARLY,
 // INTERVAL, COUNT, UNTIL, EXDATE and edited single instances.
 // Limitation: TZID times are treated as local time.
@@ -34,7 +34,7 @@ Item {
     property string status: "idle"           // idle | no-url | loading | ok | error
     property string lastRawIcs: ""
 
-    readonly property string url: icsUrl !== "" ? icsUrl : (Quickshell.env("QS_ICS_URL") || "")
+    readonly property string url: icsUrl
 
     readonly property var dow: ICalParser.DOW
 

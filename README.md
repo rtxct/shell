@@ -139,7 +139,7 @@ Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**
 | :--- | :--- |
 | [`workspaces.config.json`](./config/workspaces.config.json) | Compositor backend (`"sway"` or `"niri"`), workspace count, and poll interval. |
 | [`weather.config.json`](./config/weather.config.json) | Location coordinates, default city, and refresh timer. |
-| [`calendar.config.json`](./config/calendar.config.json) | Private `.ics` calendar URL (or `QS_ICS_URL` env variable) and fetch horizons. |
+| [`calendar.config.json`](./config/calendar.config.json) | Private `.ics` calendar URL and fetch horizons. |
 | [`sunset.config.json`](./config/sunset.config.json) | Night light coordinates and day/night color temperatures. |
 | [`audio.config.json`](./config/audio.config.json) | Volume steps, limits, and Cava spectrum settings. |
 | [`notifications.config.json`](./config/notifications.config.json) | Popup display timeouts and max visible toast count. |

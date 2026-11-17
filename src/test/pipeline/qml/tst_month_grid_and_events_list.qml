@@ -184,6 +184,7 @@ Item {
             verify(evList.message().indexOf("Couldn't fetch") >= 0)
             mockEvents.status = "no-url"
             verify(evList.message().indexOf("No calendar connected") >= 0)
+            compare(evList.message().indexOf("QS_ICS_URL"), -1)
         }
 
         function test_events_list_detail_inspection_and_reset() {
