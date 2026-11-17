@@ -54,6 +54,7 @@ Item {
             mockAudio.audioPeak = 0.0
             mockAudio.audioPeaks = [0.0, 0.0]
             mediaBar.closeMerged()
+            mediaBar.barsHidden = false
             tryCompare(mediaBar.borderVisualizerRef, "opacity", 0.0, 400)
             tryCompare(mediaBar.dropMediaRef, "strokeColor", DropStyle.strokeColor, 500)
         }
@@ -243,6 +244,25 @@ Item {
             var viz = mediaBar.borderVisualizerRef
             verify(viz.pts[0][0] < viz.padX, "Bottom-left fillet must flare outward left of padX")
             verify(viz.pts[viz.pts.length - 1][0] > viz.padX + mediaBar.btnWidth, "Bottom-right fillet must flare outward right of padX + btnWidth")
+        }
+
+        function test_hidden_mode_disables_visualizer_and_collapses_bar() {
+            mockAudio.hasAudio = true
+            mockAudio.isPlaying = true
+            mockAudio.audioPeak = 0.5
+            mockAudio.audioPeaks = [0.5, 0.5]
+
+            verify(mediaBar.borderVisualizerRef.visualizerActive)
+            compare(mediaBar.dropMediaRef.height, MediaControlBarStyle.barHeight)
+
+            mediaBar.barsHidden = true
+            verify(!mediaBar.borderVisualizerRef.visualizerActive)
+            tryCompare(mediaBar.dropMediaRef, "height", MediaControlBarStyle.hiddenHeight, 500)
+            tryCompare(mediaBar.borderVisualizerRef, "opacity", 0.0, 500)
+
+            mediaBar.barsHidden = false
+            verify(mediaBar.borderVisualizerRef.visualizerActive)
+            tryCompare(mediaBar.dropMediaRef, "height", MediaControlBarStyle.barHeight, 500)
         }
     }
 }

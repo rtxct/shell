@@ -120,3 +120,17 @@ def test_app_menu_persists_sort_and_starts_selection_at_zero():
 
     # Verify pressing Enter on open launches first item without needing search query
     assert "else if (filteredApps.length > 0)" in app_menu_content
+
+
+def test_bars_ipc_handler_and_toggle_script():
+    shell_content = SHELL_QML.read_text(encoding="utf-8")
+    bar_content = BAR_QML.read_text(encoding="utf-8")
+    toggle_bars = REPO_ROOT / "commands" / "toggle-bars.sh"
+
+    assert 'target: "bars"' in shell_content
+    assert "property bool barsHidden: false" in shell_content
+    assert "barsHidden: root.barsHidden" in shell_content
+    assert "property bool barsHidden: false" in bar_content
+    assert toggle_bars.exists()
+    assert os.access(toggle_bars, os.X_OK)
+    assert "ipc call bars" in toggle_bars.read_text(encoding="utf-8")

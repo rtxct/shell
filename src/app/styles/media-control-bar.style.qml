@@ -42,6 +42,9 @@ QtObject {
 
     readonly property real mediaBaseWidth: 260
     readonly property real barHeight: 36
+    readonly property real hiddenHeight: 8
+    readonly property real hiddenTipSize: 8
+    readonly property int unhoverDelayMs: 120
     readonly property real circleDiameter: 26
     readonly property real circleSpacing: 10
     readonly property real dropGap: 12

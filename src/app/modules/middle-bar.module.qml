@@ -42,11 +42,11 @@ Island {
 
     // ── shape (this island's own numbers) ──
     idleLen: MiddleBarStyle.idleLen
-    idleDepth: MiddleBarStyle.idleDepth
-    idleSlant: MiddleBarStyle.idleSlant
-    hoverLen: MiddleBarStyle.hoverLen
-    hoverDepth: MiddleBarStyle.hoverDepth
-    hoverSlant: MiddleBarStyle.hoverSlant
+    idleDepth: root.barsHidden ? MiddleBarStyle.hiddenDepth : MiddleBarStyle.idleDepth
+    idleSlant: root.barsHidden ? MiddleBarStyle.hiddenSlant : MiddleBarStyle.idleSlant
+    hoverLen: root.barsHidden ? MiddleBarStyle.idleLen : MiddleBarStyle.hoverLen
+    hoverDepth: root.barsHidden ? MiddleBarStyle.idleDepth : MiddleBarStyle.hoverDepth
+    hoverSlant: root.barsHidden ? MiddleBarStyle.idleSlant : MiddleBarStyle.hoverSlant
     openLen: barW
     openDepth: MiddleBarStyle.openDepth                        // keep equal to SideBar.expandedH
     openSlant: MiddleBarStyle.openSlant                         // keep equal to SideBar.expandedSlant
@@ -67,7 +67,7 @@ Island {
         cell: MiddleBarStyle.hoverCellSize
         now: root.ctl.now
         markers: root.ctl.events ? root.ctl.events.daysWithEvents : ({})
-        opacity: root.hoverOpacity
+        opacity: root.barsHidden ? 0 : root.hoverOpacity
         visible: opacity > 0.01
     }
 
@@ -75,8 +75,8 @@ Island {
     Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width
-        height: Math.max(0, root.idleDepth - root.stripH - DropStyle.bottomInset)
-        opacity: root.idleOpacity * Math.max(0, 1 - root.hoverFade * 3)
+        height: Math.max(0, MiddleBarStyle.idleDepth - root.stripH - DropStyle.bottomInset)
+        opacity: root.barsHidden ? (root.idleOpacity * root.hoverFade) : (root.idleOpacity * Math.max(0, 1 - root.hoverFade * 3))
         visible: opacity > 0.01
 
         Text {

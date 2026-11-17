@@ -33,8 +33,8 @@ Island {
 
     // ── shape (this island's own numbers) ──
     idleLen: dynamicLen
-    idleDepth: WorkspaceIslandStyle.idleDepth
-    idleSlant: WorkspaceIslandStyle.idleSlant
+    idleDepth: root.barsHidden ? WorkspaceIslandStyle.hiddenDepth : WorkspaceIslandStyle.idleDepth
+    idleSlant: root.barsHidden ? WorkspaceIslandStyle.hiddenSlant : WorkspaceIslandStyle.idleSlant
     dropFlare: WorkspaceIslandStyle.flare
     hoverLen: dynamicLen + Math.max(0, WorkspaceIslandStyle.hoverLen - WorkspaceIslandStyle.idleLen)
     hoverDepth: WorkspaceIslandStyle.hoverDepth
@@ -78,7 +78,7 @@ Island {
 
     Column {
         anchors.centerIn: parent
-        opacity: root.idleOpacity
+        opacity: root.barsHidden ? (root.idleOpacity * root.hoverFade) : root.idleOpacity
         visible: opacity > 0.01
 
         Repeater {

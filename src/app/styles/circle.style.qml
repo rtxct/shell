@@ -35,6 +35,8 @@ QtObject {
     readonly property real detachThresholdHypot: 18
 
     readonly property real diameter: 26
+    readonly property real hiddenTipSize: 8
+    readonly property int unhoverDelayMs: 120
     readonly property int glyphFontPx: 11
     readonly property real spacing: 60
     readonly property real innerOffset: 140

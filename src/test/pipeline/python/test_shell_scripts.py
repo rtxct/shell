@@ -653,3 +653,36 @@ def test_install_script_interactive_cancel(tmp_path):
     assert "Installation cancelled." in res.stdout
     assert (qs_dir / "sentinel.txt").read_text(encoding="utf-8") == "untouched"
     assert len(list(tmp_path.glob("quickshell-backup-*"))) == 0
+
+
+def test_toggle_bars_script(tmp_path):
+    toggle_bars = REPO_ROOT / "commands" / "toggle-bars.sh"
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    log_file = tmp_path / "qs.log"
+
+    _write_executable(
+        bin_dir / "qs",
+        f"""#!/usr/bin/env sh
+echo "$*" >> "{log_file}"
+""",
+    )
+
+    env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}:{env.get('PATH', '')}"
+
+    for args, expected in [
+        ([], "ipc call bars toggle"),
+        (["hide"], "ipc call bars hide"),
+        (["show"], "ipc call bars show"),
+    ]:
+        log_file.write_text("", encoding="utf-8")
+        res = subprocess.run(
+            ["bash", str(toggle_bars), *args],
+            env=env,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert res.returncode == 0
+        assert expected in log_file.read_text(encoding="utf-8")

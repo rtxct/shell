@@ -2,7 +2,7 @@
 // File: components/circle.component.qml
 // Purpose: Circular launcher button executing a two-phase orthogonal flight trajectory with liquid squash-and-stretch physics.
 // Public API:
-//   - Properties: ctl, stripH, vertical, side, slot, panelId, title, glyph, panel, diameter, spacing, innerOffset ...
+//   - Properties: ctl, stripH, vertical, side, slot, panelId, title, glyph, panel, diameter, spacing, innerOffset, barsHidden, maskItem ...
 //   - Functions:  clamp01(v), easeInOut(t)
 // Dependencies: QtQuick, "../styles"
 // ============================================================================
@@ -21,6 +21,7 @@ Item {
     // ── input from the parent ──
     required property var ctl
     property real stripH: 6           // thickness of the strip it sits next to
+    property bool barsHidden: false   // collapsed-to-edge mode toggled via IPC/command
 
     // ── what it is ──
     property bool vertical: false     // true = on a vertical (left) bar
@@ -46,7 +47,22 @@ Item {
     property real damping: CircleStyle.hoverDamping
     property int travelDuration: CircleStyle.flightDurationMs  // flight to the middle / back
 
-    readonly property bool hovered: ma.containsMouse
+    property bool rawHovered: ma.containsMouse
+    property bool hot: false
+    onRawHoveredChanged: {
+        if (rawHovered) {
+            unhoverTimer.stop()
+            hot = true
+        } else {
+            unhoverTimer.restart()
+        }
+    }
+    Timer {
+        id: unhoverTimer
+        interval: CircleStyle.unhoverDelayMs
+        onTriggered: root.hot = false
+    }
+    readonly property bool hovered: rawHovered || hot
     readonly property bool mine: ctl.owner === panelId
     readonly property bool flying: (mine && (ctl.phase === "travelling" || ctl.phase === "returning")) || travelAnim.running
     property real effectiveStep: 2 - slot
@@ -83,7 +99,10 @@ Item {
     readonly property real curA: curCenterA - curLenA / 2
 
     // homeD: flush at the edge; midD: docking position at the center
-    readonly property real homeD: stripH + topGap
+    readonly property real normalHomeD: stripH + topGap
+    readonly property real hiddenHomeD: -diameter + CircleStyle.hiddenTipSize
+    property real homeD: (!barsHidden || hovered || flying || isDetaching) ? normalHomeD : hiddenHomeD
+    Behavior on homeD { NumberAnimation { duration: CircleStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
     readonly property real midD: 0
     readonly property real curD: homeD + (midD - homeD) * travelD
 
@@ -215,7 +234,7 @@ Item {
             color: root.glyphColor
             font.family: "Symbols Nerd Font"
             font.pixelSize: root.glyphSize
-            opacity: !root.flying && !root.ctl.busy ? (root.hovered ? 1.0 : (root.alwaysShowGlyph ? CircleStyle.glyphHoverOpacity : 0.0)) : 0.0
+            opacity: !root.flying && !root.ctl.busy ? (root.hovered ? 1.0 : ((!root.barsHidden && root.alwaysShowGlyph) ? CircleStyle.glyphHoverOpacity : 0.0)) : 0.0
             Behavior on opacity { NumberAnimation { duration: CircleStyle.glyphFadeDurationMs } }
         }
     }
@@ -227,9 +246,21 @@ Item {
 
     readonly property bool isFloatingNow: floatManager ? floatManager.isFloating(root.panelId) : false
 
+    readonly property Item maskItem: hitMask
+    Item {
+        id: hitMask
+        x: (root.vertical && root.curD > 0 && !root.flying) ? -root.curD : 0
+        y: (!root.vertical && root.curD > 0 && !root.flying) ? -root.curD : 0
+        width: root.width + ((root.vertical && root.curD > 0 && !root.flying) ? root.curD : 0)
+        height: root.height + ((!root.vertical && root.curD > 0 && !root.flying) ? root.curD : 0)
+    }
+
     MouseArea {
         id: ma
-        anchors.fill: parent
+        x: hitMask.x
+        y: hitMask.y
+        width: hitMask.width
+        height: hitMask.height
         hoverEnabled: true
         enabled: !root.isFloatingNow || root.isDetaching
         cursorShape: root.isFloatingNow ? Qt.ArrowCursor : Qt.PointingHandCursor

@@ -65,6 +65,22 @@ ShellRoot {
         }
     }
 
+    IpcHandler {
+        target: "bars"
+
+        function toggle(): void {
+            root.barsHidden = !root.barsHidden
+        }
+
+        function hide(): void {
+            root.barsHidden = true
+        }
+
+        function show(): void {
+            root.barsHidden = false
+        }
+    }
+
     signal toggleAppMenuRequested()
     signal openAppMenuRequested()
     signal closeAppMenuRequested()
@@ -72,6 +88,7 @@ ShellRoot {
     signal openClipboardRequested()
 
     property bool anyMenuOpen: false
+    property bool barsHidden: false
 
     // Shared services (one instance for all monitors).
     // NOTE: ids must NOT match Bar's property names: inside `Bar { weather: weather }` the
@@ -96,6 +113,7 @@ ShellRoot {
             notifications: notificationsSvc
             screenLocker: screenLockerSvc
             anyMenuOpen: root.anyMenuOpen
+            barsHidden: root.barsHidden
 
             onAppMenuOpenChanged: {
                 if (barItem.isLeftmostScreen && barItem.isBottommostScreen) {

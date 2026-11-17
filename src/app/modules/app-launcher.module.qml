@@ -2,7 +2,7 @@
 // File: modules/app-launcher.module.qml
 // Purpose: Bottom-left application launcher button, circular quick-action triggers, and active background tray items.
 // Public API:
-//   - Properties: menuOpen, floatManager, fg, dim, accent, fill, btnWidth, btnDepth, circleSize, circleSpacing, trayCircleSize, traySpacing, maskItem
+//   - Properties: menuOpen, menuAnimating, barsHidden, floatManager, fg, dim, accent, fill, btnWidth, btnDepth, circleSize, circleSpacing, trayCircleSize, traySpacing, maskItem ...
 //   - Signals:    appButtonClicked(), circle1Clicked(), circle2Clicked()
 // Dependencies: QtQuick, Quickshell, Quickshell.Io, Quickshell.Services.SystemTray, Quickshell.Widgets, "../components", "../styles", "../theme"
 // ============================================================================
@@ -22,6 +22,7 @@ Item {
 
     property bool menuOpen: false
     property bool menuAnimating: false
+    property bool barsHidden: false
     property var floatManager: null
     property color fg: AppLauncherStyle.textPrimary
     property color dim: AppLauncherStyle.textDim
@@ -135,27 +136,48 @@ Item {
         NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic }
     }
 
+    readonly property bool anyExpanded: !root.barsHidden || dropBtn.isHovered || dropBtn.isDetaching || c1.isHovered || c2.isHovered || trayRowHover.hovered || root.trayMenuOpen
     readonly property Item maskItem: maskArea
     Item {
         id: maskArea
         x: (root.isAppMenuFloating && !dropBtn.isDetaching) ? c1.x : 0
-        y: 0
+        y: (root.menuOpen || root.menuAnimating) ? 0 : (root.anyExpanded ? 0 : (root.height - AppLauncherStyle.hiddenHeight))
         width: (root.menuOpen || root.menuAnimating) ? 0
                : ((root.isAppMenuFloating && !dropBtn.isDetaching) ? root.allCirclesWidth : root.width)
-        height: (root.menuOpen || root.menuAnimating) ? 0 : root.height
+        height: (root.menuOpen || root.menuAnimating) ? 0 : (root.anyExpanded ? root.height : AppLauncherStyle.hiddenHeight)
     }
 
     // ── Main Applications Island (Drop format glued to bottom) ──
     Drop {
         id: dropBtn
+        property bool rawHovered: btnMouse.containsMouse
+        property bool hot: false
+        onRawHoveredChanged: {
+            if (rawHovered) {
+                btnUnhoverTimer.stop()
+                hot = true
+            } else {
+                btnUnhoverTimer.restart()
+            }
+        }
+        Timer {
+            id: btnUnhoverTimer
+            interval: AppLauncherStyle.unhoverDelayMs
+            onTriggered: dropBtn.hot = false
+        }
+        readonly property bool isHovered: rawHovered || hot
+        readonly property bool isHiddenIdle: root.barsHidden && !isHovered && !isDetaching
+        property real floatOffsetY: root.isAppMenuFloating ? (root.btnDepth + 2) : 0
+        Behavior on floatOffsetY { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs * 2; easing.type: Easing.OutCubic } }
+
         fromBottom: true
         x: 0
-        y: root.isAppMenuFloating ? (root.btnDepth + 2) : 0
+        y: (root.btnDepth - height) + floatOffsetY
         width: root.btnWidth
-        height: root.btnDepth
+        height: isHiddenIdle ? AppLauncherStyle.hiddenHeight : root.btnDepth
+        Behavior on height { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
         visible: (!root.menuOpen && !root.menuAnimating) && (y < (root.btnDepth + 1) || dropBtn.isDetaching)
         enabled: !root.isAppMenuFloating || dropBtn.isDetaching
-        Behavior on y { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs * 2; easing.type: Easing.OutCubic } }
         fill: root.fill
         slant: AppLauncherStyle.dropSlant
         rad: AppLauncherStyle.dropRadius
@@ -172,6 +194,9 @@ Item {
         Row {
             anchors.centerIn: parent
             spacing: AppLauncherStyle.contentRowSpacing
+            opacity: dropBtn.isHiddenIdle ? 0.0 : 1.0
+            visible: opacity > 0.01
+            Behavior on opacity { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
 
             // 2x2 grid icon representing applications
             Grid {
@@ -266,8 +291,26 @@ Item {
     // ── Circle 1 (Screenshot via grim + slurp + satty) ──
     Rectangle {
         id: c1
+        property bool rawHovered: c1Mouse.containsMouse
+        property bool hot: false
+        onRawHoveredChanged: {
+            if (rawHovered) {
+                c1UnhoverTimer.stop()
+                hot = true
+            } else {
+                c1UnhoverTimer.restart()
+            }
+        }
+        Timer {
+            id: c1UnhoverTimer
+            interval: AppLauncherStyle.unhoverDelayMs
+            onTriggered: c1.hot = false
+        }
+        readonly property bool isHovered: rawHovered || hot
+
         x: root.isAppMenuFloating ? root.floatedCirclesStartX : (root.btnWidth + AppLauncherStyle.circleGap)
-        anchors.verticalCenter: parent.verticalCenter
+        y: (root.barsHidden && !isHovered) ? (root.height - AppLauncherStyle.hiddenTipSize) : ((root.height - height) / 2)
+        Behavior on y { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
         width: root.circleSize
         height: root.circleSize
         radius: width / 2
@@ -311,12 +354,15 @@ Item {
             font.family: "Symbols Nerd Font"
             font.pixelSize: AppLauncherStyle.circleIconFontPx
             color: c1Mouse.containsMouse ? root.accent : root.fg
+            opacity: (root.barsHidden && !parent.isHovered) ? 0.0 : 1.0
+            Behavior on opacity { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: AppLauncherStyle.colorAnimDurationMs } }
         }
 
         MouseArea {
             id: c1Mouse
             anchors.fill: parent
+            anchors.bottomMargin: (root.barsHidden && parent.isHovered) ? -((root.height - parent.height) / 2) : 0
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
@@ -331,8 +377,26 @@ Item {
     // ── Circle 2 (On-screen color picker via hyprpicker) ──
     Rectangle {
         id: c2
+        property bool rawHovered: c2Mouse.containsMouse
+        property bool hot: false
+        onRawHoveredChanged: {
+            if (rawHovered) {
+                c2UnhoverTimer.stop()
+                hot = true
+            } else {
+                c2UnhoverTimer.restart()
+            }
+        }
+        Timer {
+            id: c2UnhoverTimer
+            interval: AppLauncherStyle.unhoverDelayMs
+            onTriggered: c2.hot = false
+        }
+        readonly property bool isHovered: rawHovered || hot
+
         x: c1.x + root.circleSize + root.circleSpacing
-        anchors.verticalCenter: parent.verticalCenter
+        y: (root.barsHidden && !isHovered) ? (root.height - AppLauncherStyle.hiddenTipSize) : ((root.height - height) / 2)
+        Behavior on y { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
         width: root.circleSize
         height: root.circleSize
         radius: width / 2
@@ -375,12 +439,15 @@ Item {
             font.family: "Symbols Nerd Font"
             font.pixelSize: AppLauncherStyle.circleIconFontPx
             color: c2Mouse.containsMouse ? root.accent : root.fg
+            opacity: (root.barsHidden && !parent.isHovered) ? 0.0 : 1.0
+            Behavior on opacity { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: AppLauncherStyle.colorAnimDurationMs } }
         }
 
         MouseArea {
             id: c2Mouse
             anchors.fill: parent
+            anchors.bottomMargin: (root.barsHidden && parent.isHovered) ? -((root.height - parent.height) / 2) : 0
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: {
@@ -396,10 +463,15 @@ Item {
     Row {
         id: trayRow
         x: c2.x + root.circleSize + root.traySpacing
-        anchors.verticalCenter: parent.verticalCenter
+        y: 0
+        height: root.height
         spacing: root.traySpacing
         opacity: root.circlesOpacity
         visible: opacity > 0.01 && trayRepeater.count > 0
+
+        HoverHandler {
+            id: trayRowHover
+        }
 
         Repeater {
             id: trayRepeater
@@ -408,6 +480,26 @@ Item {
             Item {
                 id: delegateRoot
                 required property var modelData
+
+                property bool rawHovered: trayMouse.containsMouse
+                property bool hot: false
+                onRawHoveredChanged: {
+                    if (rawHovered) {
+                        trayUnhoverTimer.stop()
+                        hot = true
+                    } else {
+                        trayUnhoverTimer.restart()
+                    }
+                }
+                Timer {
+                    id: trayUnhoverTimer
+                    interval: AppLauncherStyle.unhoverDelayMs
+                    onTriggered: delegateRoot.hot = false
+                }
+                readonly property bool isHovered: rawHovered || hot || (root.trayMenuItem === delegateRoot.modelData)
+
+                y: (root.barsHidden && !delegateRoot.isHovered) ? (root.height - AppLauncherStyle.hiddenTipSize) : ((root.height - height) / 2)
+                Behavior on y { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
 
                 width: root.trayCircleSize
                 height: root.trayCircleSize
@@ -456,6 +548,8 @@ Item {
                         width: AppLauncherStyle.trayIconSize
                         height: AppLauncherStyle.trayIconSize
                         source: (delegateRoot.modelData && delegateRoot.modelData.icon) ? delegateRoot.modelData.icon : ""
+                        opacity: (root.barsHidden && !delegateRoot.isHovered) ? 0.0 : 1.0
+                        Behavior on opacity { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
                         visible: status === Image.Ready
                     }
 
@@ -468,6 +562,8 @@ Item {
                         font.pixelSize: AppLauncherStyle.circleIconFontPx
                         font.weight: Font.Bold
                         color: trayMouse.containsMouse ? root.accent : root.fg
+                        opacity: (root.barsHidden && !delegateRoot.isHovered) ? 0.0 : 1.0
+                        Behavior on opacity { NumberAnimation { duration: AppLauncherStyle.fadeDurationMs; easing.type: Easing.OutCubic } }
                         Behavior on color { ColorAnimation { duration: AppLauncherStyle.colorAnimDurationMs } }
                     }
                 }
@@ -502,6 +598,7 @@ Item {
                 MouseArea {
                     id: trayMouse
                     anchors.fill: parent
+                    anchors.bottomMargin: (root.barsHidden && delegateRoot.isHovered) ? -((root.height - delegateRoot.height) / 2) : 0
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor

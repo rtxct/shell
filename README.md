@@ -124,6 +124,13 @@ qs ipc call lock lock
 # or: ~/.config/quickshell/commands/lock-screen.sh
 ```
 
+**Hide / show bars**
+
+```bash
+qs ipc call bars toggle
+# or: ~/.config/quickshell/commands/toggle-bars.sh
+```
+
 ## Configuration
 
 Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**.

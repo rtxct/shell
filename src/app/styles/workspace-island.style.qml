@@ -18,12 +18,14 @@ QtObject {
 
     readonly property real idleLen: 200
     readonly property real idleDepth: 44
+    readonly property real hiddenDepth: 8
     readonly property real hoverLen: 200
     readonly property real hoverDepth: 44
     readonly property real openScreenMargin: 100
     readonly property real openDepth: 560
 
     readonly property real idleSlant: 16
+    readonly property real hiddenSlant: 10
     readonly property real hoverSlant: 16
     readonly property real openSlant: 28
     readonly property real flare: 12

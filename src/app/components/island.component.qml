@@ -2,7 +2,7 @@
 // File: components/island.component.qml
 // Purpose: Base three-state expandable container (idle pill -> hover pill -> open panel) with drag-to-detach support.
 // Public API:
-//   - Properties: ctl, vertical, stripH, panelId, title, clickPanel, fill, fg, dim, accent, dropRadius, dropFlare ...
+//   - Properties: ctl, vertical, stripH, barsHidden, panelId, title, clickPanel, fill, fg, dim, accent, dropRadius, dropFlare ...
 //   - Functions:  clamp01(v)
 // Dependencies: QtQuick, "../styles"
 // ============================================================================
@@ -22,6 +22,7 @@ Item {
     required property var ctl
     property bool vertical: false         // false: hangs from the top edge · true: from the left edge
     property real stripH: 6               // thickness of the strip it hangs from
+    property bool barsHidden: false       // collapsed-to-edge mode toggled via IPC/command
 
     // ── what a click opens ──
     property string panelId: ""

@@ -2,7 +2,7 @@
 // File: modules/media-control-bar.module.qml
 // Purpose: Bottom-right media and volume controller with merging volume/mic circles and live PipeWire audio peak perimeter wave.
 // Public API:
-//   - Properties: audio, floatManager, fg, dim, accent, fill, danger, btnWidth, btnDepth, circleSize, circleSpacing, mergedMode, isActivelyDetaching ...
+//   - Properties: audio, floatManager, barsHidden, fg, dim, accent, fill, danger, btnWidth, btnDepth, circleSize, circleSpacing, mergedMode, isActivelyDetaching ...
 //   - Functions:  openMerged(mode), closeMerged(), currentAudioIcon(), currentVolume(), currentRatio(), handleWheel(wheel), beginMediaDetach(sceneX, sceneY), updateMediaDetach(sceneX, sceneY), endMediaDetach(), cancelMediaDetach()
 // Dependencies: QtQuick, "../components", "../styles", "../theme", QtQuick.Shapes
 // ============================================================================
@@ -22,6 +22,7 @@ Item {
 
     required property var audio
     property var floatManager: null
+    property bool barsHidden: false
 
     property color fg: MediaControlBarStyle.textPrimary
     property color dim: MediaControlBarStyle.textDim
@@ -216,12 +217,14 @@ Item {
         return 0
     }
 
+    readonly property bool anyExpanded: !root.barsHidden || root.isMerged || root.isActivelyDetaching || dropMedia.isMediaHovered || circleVolume.isHovered || circleMic.isHovered
+
     Item {
         id: barMask
         x: root.activeLeftX
-        y: 0
+        y: root.anyExpanded ? 0 : (root.height - MediaControlBarStyle.hiddenHeight)
         width: Math.max(0, root.activeRightX - root.activeLeftX)
-        height: root.height
+        height: root.anyExpanded ? root.height : MediaControlBarStyle.hiddenHeight
     }
 
     Item {
@@ -235,11 +238,29 @@ Item {
     // ────────────────────────────────────────────────────────────────
     Rectangle {
         id: circleVolume
+        property bool rawHovered: volCircleMouse.containsMouse
+        property bool hot: false
+        onRawHoveredChanged: {
+            if (rawHovered) {
+                volUnhoverTimer.stop()
+                hot = true
+            } else {
+                volUnhoverTimer.restart()
+            }
+        }
+        Timer {
+            id: volUnhoverTimer
+            interval: MediaControlBarStyle.unhoverDelayMs
+            onTriggered: circleVolume.hot = false
+        }
+        readonly property bool isHovered: rawHovered || hot
+
         x: root.isMerged ? 0
            : ((root.isSoundFloating && !root.isMediaDetaching)
               ? (root.isMicGone ? root.floatedSingleCircleX : root.floatedCirclesStartX)
               : (root.isMicGone ? (root.circleSize + root.circleSpacing) : 0))
-        anchors.verticalCenter: parent.verticalCenter
+        y: (root.barsHidden && !isHovered && !isDetaching && !root.isMerged) ? (root.height - MediaControlBarStyle.hiddenTipSize) : ((root.height - height) / 2)
+        Behavior on y { NumberAnimation { duration: MediaControlBarStyle.circleMoveDurationMs; easing.type: Easing.OutCubic } }
         width: root.circleSize
         height: root.circleSize
         radius: width / 2
@@ -301,6 +322,8 @@ Item {
             font.pixelSize: MediaControlBarStyle.circleIconFontPx
             color: (!root.audio || root.audio.sinkMuted) ? root.danger
                    : (volCircleMouse.containsMouse ? root.accent : root.fg)
+            opacity: (root.barsHidden && !parent.isHovered && !parent.isDetaching) ? 0.0 : 1.0
+            Behavior on opacity { NumberAnimation { duration: MediaControlBarStyle.circleFadeDurationMs; easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: MediaControlBarStyle.colorAnimDurationMs } }
         }
 
@@ -311,6 +334,7 @@ Item {
         MouseArea {
             id: volCircleMouse
             anchors.fill: parent
+            anchors.bottomMargin: (root.barsHidden && parent.isHovered) ? -((root.height - parent.height) / 2) : 0
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -380,11 +404,29 @@ Item {
     // ────────────────────────────────────────────────────────────────
     Rectangle {
         id: circleMic
+        property bool rawHovered: micCircleMouse.containsMouse
+        property bool hot: false
+        onRawHoveredChanged: {
+            if (rawHovered) {
+                micUnhoverTimer.stop()
+                hot = true
+            } else {
+                micUnhoverTimer.restart()
+            }
+        }
+        Timer {
+            id: micUnhoverTimer
+            interval: MediaControlBarStyle.unhoverDelayMs
+            onTriggered: circleMic.hot = false
+        }
+        readonly property bool isHovered: rawHovered || hot
+
         x: root.isMerged ? 0
            : ((root.isSoundFloating && !root.isMediaDetaching)
               ? (root.isVolumeBarFloating ? root.floatedSingleCircleX : (root.floatedCirclesStartX + root.circleSize + root.circleSpacing))
               : (root.circleSize + root.circleSpacing))
-        anchors.verticalCenter: parent.verticalCenter
+        y: (root.barsHidden && !isHovered && !isDetaching && !root.isMerged) ? (root.height - MediaControlBarStyle.hiddenTipSize) : ((root.height - height) / 2)
+        Behavior on y { NumberAnimation { duration: MediaControlBarStyle.circleMoveDurationMs; easing.type: Easing.OutCubic } }
         width: root.circleSize
         height: root.circleSize
         radius: width / 2
@@ -442,6 +484,8 @@ Item {
             font.pixelSize: MediaControlBarStyle.circleIconFontPx
             color: (!root.audio || root.audio.sourceMuted) ? root.danger
                    : (micCircleMouse.containsMouse ? root.accent : root.fg)
+            opacity: (root.barsHidden && !parent.isHovered && !parent.isDetaching) ? 0.0 : 1.0
+            Behavior on opacity { NumberAnimation { duration: MediaControlBarStyle.circleFadeDurationMs; easing.type: Easing.OutCubic } }
             Behavior on color { ColorAnimation { duration: MediaControlBarStyle.colorAnimDurationMs } }
         }
 
@@ -452,6 +496,7 @@ Item {
         MouseArea {
             id: micCircleMouse
             anchors.fill: parent
+            anchors.bottomMargin: (root.barsHidden && parent.isHovered) ? -((root.height - parent.height) / 2) : 0
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -535,7 +580,7 @@ Item {
         property real animTime: 0.0
 
         readonly property bool hasAudio: root.audio ? root.audio.hasAudio : false
-        readonly property bool visualizerActive: !root.isMerged && !root.isSoundFloating && hasAudio
+        readonly property bool visualizerActive: !root.barsHidden && !root.isMerged && !root.isSoundFloating && hasAudio
         readonly property bool shouldRun: visualizerActive || opacity > 0.01
         readonly property bool isVisualizerActive: visualizerActive || opacity > 0.01
 
@@ -902,11 +947,17 @@ Item {
     // ────────────────────────────────────────────────────────────────
     Drop {
         id: dropMedia
+        readonly property bool isMediaHovered: mergedBarHover.hovered || mediaUnhoverTimer.running || prevMouse.containsMouse || playMouse.containsMouse || nextMouse.containsMouse || trackMouse.containsMouse || iconMouse.containsMouse || trackMouse.pressed
+        readonly property bool isHiddenIdle: root.barsHidden && !isMediaHovered && !root.isMerged && !root.isMediaDetaching
+        property real floatOffsetY: (root.isSoundFloating && !root.isMerged && !root.isMediaDetaching) ? (root.btnDepth + 2) : 0
+        Behavior on floatOffsetY { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
+
         fromBottom: true
         x: root.isMerged ? 0 : (root.circleSize * 2 + root.circleSpacing + MediaControlBarStyle.dropGap)
-        y: (root.isSoundFloating && !root.isMerged && !root.isMediaDetaching) ? (root.btnDepth + 2) : 0
+        y: (root.btnDepth - height) + floatOffsetY
         width: root.isMerged ? root.width : root.btnWidth
-        height: root.btnDepth
+        height: isHiddenIdle ? MediaControlBarStyle.hiddenHeight : root.btnDepth
+        Behavior on height { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
         fill: borderVisualizer.visualizerActive ? MediaControlBarStyle.dropActiveFillColor : root.fill
         Behavior on fill { ColorAnimation { duration: MediaControlBarStyle.waveFadeDurationMs; easing.type: Easing.OutCubic } }
         strokeColor: borderVisualizer.visualizerActive ? MediaControlBarStyle.dropActiveStrokeColor : DropStyle.strokeColor
@@ -920,14 +971,18 @@ Item {
         bottomInset: MediaControlBarStyle.dropBottomInset
 
         Behavior on x { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
-        Behavior on y { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
         Behavior on width { NumberAnimation { duration: MediaControlBarStyle.mergeDurationMs; easing.type: Easing.OutCubic } }
         visible: y < (root.btnDepth + 1) || root.isMediaDetaching
         enabled: !root.isSoundFloating || root.isMerged || root.isMediaDetaching
 
         readonly property bool audioPlaying: (root.audio && (root.audio.isPlaying || root.audio.hasAudio)) ? true : false
-        readonly property bool showNowPlaying: !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && audioPlaying && !mergedBarHover.hovered
-        readonly property bool showMediaControls: !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && (!audioPlaying || mergedBarHover.hovered)
+        readonly property bool showNowPlaying: !dropMedia.isHiddenIdle && !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && audioPlaying && !mergedBarHover.hovered
+        readonly property bool showMediaControls: !dropMedia.isHiddenIdle && !root.isMerged && (!root.isSoundFloating || root.isMediaDetaching) && (!audioPlaying || mergedBarHover.hovered)
+
+        Timer {
+            id: mediaUnhoverTimer
+            interval: MediaControlBarStyle.unhoverDelayMs
+        }
 
         // HoverHandler to detect hover over the audio bar (switches Now Playing -> Media Controls and manages merged unmerge timer)
         HoverHandler {
@@ -936,8 +991,10 @@ Item {
             enabled: true
             onHoveredChanged: {
                 if (hovered) {
+                    mediaUnhoverTimer.stop()
                     unmergeTimer.stop()
                 } else {
+                    mediaUnhoverTimer.restart()
                     if (root.isMerged && !trackMouse.pressed) {
                         unmergeTimer.restart()
                     }

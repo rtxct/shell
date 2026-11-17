@@ -2,7 +2,7 @@
 // File: modules/bar.module.qml
 // Purpose: Per-monitor Wayland LayerShell window orchestrator managing space reservation surfaces, bar canvas, input masks, and floating window layer.
 // Public API:
-//   - Properties: modelData, weather, events, workspaces, audio, sticknotes, notifications, screenW, screenH, windowGap, barMaxWidth, topGap, leftGap, bottomGap, rightGap, isLeftmostScreen, isRightmostScreen, isTopmostScreen, isBottommostScreen ...
+//   - Properties: modelData, weather, events, workspaces, audio, sticknotes, notifications, screenW, screenH, windowGap, barMaxWidth, topGap, leftGap, bottomGap, rightGap, barsHidden, isLeftmostScreen, isRightmostScreen, isTopmostScreen, isBottommostScreen ...
 //   - Functions:  applyLayoutConfig(text), closeAll()
 // Dependencies: Quickshell, "../components", "../theme", Quickshell.Io, Quickshell.Wayland, QtQuick
 // ============================================================================
@@ -60,6 +60,7 @@ Scope {
     property real bottomGap: 18                    // space between bottom of monitor and tiled windows
     property real rightGap: 18                     // space between right of monitor and tiled windows
     property bool appMenuOpen: false
+    property bool barsHidden: false
 
     // ───── multi-monitor perimeter & outer edge detection ─────
     readonly property bool isLeftmostScreen: {
@@ -320,12 +321,12 @@ Scope {
             Region { item: (scope.isTopmostScreen && (!floatManager || !floatManager.isTopRightFloating || topRight.isDetaching)) ? topRight.maskItem : null }
             Region { item: (scope.isTopmostScreen && (!floatManager || !floatManager.isCalendarFloating || middleBar.isActivelyDetaching)) ? middleBar.maskItem : null }
             Region { item: (scope.isLeftmostScreen && (!floatManager || !floatManager.isWorkspacesFloating || wsIsland.isActivelyDetaching || ctlLeft.busy)) ? wsIsland.maskItem : null }
-            Region { item: (scope.isLeftmostScreen && (!cu0.isFloatingNow || cu0.isDetaching)) ? cu0 : null }
-            Region { item: (scope.isLeftmostScreen && (!cu1.isFloatingNow || cu1.isDetaching)) ? cu1 : null }
-            Region { item: (scope.isLeftmostScreen && (!cu2.isFloatingNow || cu2.isDetaching)) ? cu2 : null }
-            Region { item: (scope.isLeftmostScreen && (!cd2.isFloatingNow || cd2.isDetaching)) ? cd2 : null }
-            Region { item: (scope.isLeftmostScreen && (!cd1.isFloatingNow || cd1.isDetaching)) ? cd1 : null }
-            Region { item: (scope.isLeftmostScreen && (!cd0.isFloatingNow || cd0.isDetaching)) ? cd0 : null }
+            Region { item: (scope.isLeftmostScreen && (!cu0.isFloatingNow || cu0.isDetaching)) ? cu0.maskItem : null }
+            Region { item: (scope.isLeftmostScreen && (!cu1.isFloatingNow || cu1.isDetaching)) ? cu1.maskItem : null }
+            Region { item: (scope.isLeftmostScreen && (!cu2.isFloatingNow || cu2.isDetaching)) ? cu2.maskItem : null }
+            Region { item: (scope.isLeftmostScreen && (!cd2.isFloatingNow || cd2.isDetaching)) ? cd2.maskItem : null }
+            Region { item: (scope.isLeftmostScreen && (!cd1.isFloatingNow || cd1.isDetaching)) ? cd1.maskItem : null }
+            Region { item: (scope.isLeftmostScreen && (!cd0.isFloatingNow || cd0.isDetaching)) ? cd0.maskItem : null }
             Region { item: (scope.isLeftmostScreen && scope.isBottommostScreen) ? appLauncher.maskItem : null }
             Region { item: (scope.isLeftmostScreen && scope.isBottommostScreen && appLauncher.trayMenuOpen) ? appLauncher.menuMaskItem : null }
             Region { item: (scope.isLeftmostScreen && scope.isBottommostScreen) ? appMenu.maskItem : null }
@@ -378,12 +379,12 @@ Scope {
             readonly property real circleInnerOffset: dockedCircleInnerOffset + (floatedCircleInnerOffset - dockedCircleInnerOffset) * (wsIsland ? wsIsland.floatRetractProgress : 0)
 
             // ───── left bar ─────
-            CircleUpOuter    { id: cu0; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: (cu2.isFloatingNow ? 0 : 1) + (cu1.isFloatingNow ? 0 : 1) }
-            CircleUpMiddle   { id: cu1; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: cu2.isFloatingNow ? 0 : 1 }
-            CircleUpInner    { id: cu2; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: 0 }
-            CircleDownInner  { id: cd2; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: 0 }
-            CircleDownMiddle { id: cd1; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: cd2.isFloatingNow ? 0 : 1 }
-            CircleDownOuter  { id: cd0; ctl: ctlLeft; stripH: 0; floatManager: floatManager; visible: scope.isLeftmostScreen; screenLocker: scope.screenLocker; innerOffset: scene.circleInnerOffset; effectiveStep: (cd2.isFloatingNow ? 0 : 1) + (cd1.isFloatingNow ? 0 : 1) }
+            CircleUpOuter    { id: cu0; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: (cu2.isFloatingNow ? 0 : 1) + (cu1.isFloatingNow ? 0 : 1) }
+            CircleUpMiddle   { id: cu1; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: cu2.isFloatingNow ? 0 : 1 }
+            CircleUpInner    { id: cu2; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: 0 }
+            CircleDownInner  { id: cd2; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: 0 }
+            CircleDownMiddle { id: cd1; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; innerOffset: scene.circleInnerOffset; effectiveStep: cd2.isFloatingNow ? 0 : 1 }
+            CircleDownOuter  { id: cd0; ctl: ctlLeft; stripH: 0; barsHidden: scope.barsHidden; floatManager: floatManager; visible: scope.isLeftmostScreen; screenLocker: scope.screenLocker; innerOffset: scene.circleInnerOffset; effectiveStep: (cd2.isFloatingNow ? 0 : 1) + (cd1.isFloatingNow ? 0 : 1) }
 
             WorkspaceIsland {
                 id: wsIsland
@@ -391,6 +392,7 @@ Scope {
                 ctl: ctlLeft
                 stripH: 0
                 barLen: scope.leftLen
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 visible: scope.isLeftmostScreen
             }
@@ -417,6 +419,7 @@ Scope {
                 ctl: ctlTop
                 stripH: topStrip.thickness
                 barW: scope.barW
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 visible: scope.isTopmostScreen
             }
@@ -450,6 +453,7 @@ Scope {
                 anchors.bottom: parent.bottom
                 menuOpen: scope.appMenuOpen
                 menuAnimating: appMenu.activeOrAnimating
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 visible: scope.isLeftmostScreen && scope.isBottommostScreen
                 onAppButtonClicked: scope.toggleAppMenu()
@@ -470,6 +474,7 @@ Scope {
                 x: parent.width - scope.launcherX - width
                 anchors.bottom: parent.bottom
                 audio: scope.audio
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 opacity: (scope.isRightmostScreen && scope.isBottommostScreen && !scope.appMenuOpen && !appMenu.activeOrAnimating) ? 1 : 0
                 visible: scope.isRightmostScreen && scope.isBottommostScreen && opacity > 0.01
