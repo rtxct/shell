@@ -17,6 +17,7 @@ CLAIM_BUS_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "notifications" / "cl
 STREAM_CAVA_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "audio" / "stream-cava-bars.sh"
 TOGGLE_MENU_SCRIPT = REPO_ROOT / "commands" / "toggle-menu.sh"
 FOCUS_APP_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "notifications" / "focus-notification-app.sh"
+INSTALL_SCRIPT = REPO_ROOT / "install.sh"
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -512,3 +513,143 @@ exit 1
         check=False,
     )
     assert res.returncode == 0
+
+
+def test_install_script_fresh_install(tmp_path):
+    env = os.environ.copy()
+    env["XDG_CONFIG_HOME"] = str(tmp_path)
+    res = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT)],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Successfully installed Quickshell configuration" in res.stdout
+    qs_dir = tmp_path / "quickshell"
+    assert (qs_dir / "shell.qml").is_file()
+    assert (qs_dir / "config" / "audio.config.json").is_file()
+    assert (qs_dir / "commands" / "toggle-menu.sh").is_file()
+    assert os.access(qs_dir / "commands" / "toggle-menu.sh", os.X_OK)
+
+
+def test_install_script_merge_mode_preserves_user_configs_and_adds_repo_configs(tmp_path):
+    qs_dir = tmp_path / "quickshell"
+    config_dir = qs_dir / "config"
+    config_dir.mkdir(parents=True)
+
+    # User customized weather.config.json
+    custom_weather = '{"custom": "user_weather_value"}'
+    (config_dir / "weather.config.json").write_text(custom_weather, encoding="utf-8")
+
+    # Extra user custom config file
+    custom_file = '{"custom_key": 123}'
+    (config_dir / "my_custom.config.json").write_text(custom_file, encoding="utf-8")
+
+    # Dummy old code file that shouldn't survive in target root
+    (qs_dir / "old_stale_file.txt").write_text("old", encoding="utf-8")
+
+    env = os.environ.copy()
+    env["XDG_CONFIG_HOME"] = str(tmp_path)
+
+    res = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT), "--merge"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Merging configuration (existing ~/.config settings take priority)" in res.stdout
+    assert "Successfully installed Quickshell configuration" in res.stdout
+
+    # Verify backup was created
+    backups = list(tmp_path.glob("quickshell-backup-*"))
+    assert len(backups) == 1
+    assert (backups[0] / "config" / "weather.config.json").read_text(encoding="utf-8") == custom_weather
+
+    # User customized file took priority over repository default
+    assert (qs_dir / "config" / "weather.config.json").read_text(encoding="utf-8") == custom_weather
+    # User's extra config file was preserved
+    assert (qs_dir / "config" / "my_custom.config.json").read_text(encoding="utf-8") == custom_file
+    # New repository config files were merged in
+    assert (qs_dir / "config" / "audio.config.json").is_file()
+    # Runtime files were updated
+    assert (qs_dir / "shell.qml").is_file()
+    assert not (qs_dir / "old_stale_file.txt").exists()
+
+
+def test_install_script_interactive_merge_default(tmp_path):
+    qs_dir = tmp_path / "quickshell"
+    config_dir = qs_dir / "config"
+    config_dir.mkdir(parents=True)
+    custom_audio = '{"custom": "user_audio"}'
+    (config_dir / "audio.config.json").write_text(custom_audio, encoding="utf-8")
+
+    env = os.environ.copy()
+    env["XDG_CONFIG_HOME"] = str(tmp_path)
+
+    # Sending newline (empty string) accepts default [M]erge
+    res = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT)],
+        input="\n",
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Merging configuration (existing ~/.config settings take priority)" in res.stdout
+    assert (qs_dir / "config" / "audio.config.json").read_text(encoding="utf-8") == custom_audio
+
+
+def test_install_script_overwrite_mode(tmp_path):
+    qs_dir = tmp_path / "quickshell"
+    config_dir = qs_dir / "config"
+    config_dir.mkdir(parents=True)
+    custom_weather = '{"custom": "user_weather"}'
+    (config_dir / "weather.config.json").write_text(custom_weather, encoding="utf-8")
+    (config_dir / "unique_user_file.json").write_text("{}", encoding="utf-8")
+
+    env = os.environ.copy()
+    env["XDG_CONFIG_HOME"] = str(tmp_path)
+
+    res = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT), "--overwrite"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Performing clean overwrite with repository defaults" in res.stdout
+    assert "Successfully installed Quickshell configuration" in res.stdout
+
+    # Backup was created
+    backups = list(tmp_path.glob("quickshell-backup-*"))
+    assert len(backups) == 1
+
+    # Overwritten with repo default
+    installed_weather = (qs_dir / "config" / "weather.config.json").read_text(encoding="utf-8")
+    assert installed_weather != custom_weather
+    assert "refreshMinutes" in installed_weather
+    # User's extra config file is NOT in the clean overwrite
+    assert not (qs_dir / "config" / "unique_user_file.json").exists()
+
+
+def test_install_script_interactive_cancel(tmp_path):
+    qs_dir = tmp_path / "quickshell"
+    qs_dir.mkdir(parents=True)
+    (qs_dir / "sentinel.txt").write_text("untouched", encoding="utf-8")
+
+    env = os.environ.copy()
+    env["XDG_CONFIG_HOME"] = str(tmp_path)
+
+    res = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT)],
+        input="c\n",
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Installation cancelled." in res.stdout
+    assert (qs_dir / "sentinel.txt").read_text(encoding="utf-8") == "untouched"
+    assert len(list(tmp_path.glob("quickshell-backup-*"))) == 0

@@ -92,7 +92,10 @@ quickshell -p .
 **Install into `~/.config/quickshell`** (backs up any existing configuration first):
 
 ```bash
-./install.sh
+./install.sh             # Interactive ([M]erge user configs / [O]verwrite / [C]ancel)
+# Or non-interactive:
+./install.sh --merge     # Preserves your existing ~/.config settings with priority
+./install.sh --overwrite # Fresh install with repository defaults
 qs
 ```
 
