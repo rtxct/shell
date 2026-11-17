@@ -8,8 +8,8 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color urgentColor: Theme.danger
-    readonly property color accentText: Theme.textOnAccent
+    readonly property color urgentColor: Theme.workspaceIslandUrgentColor
+    readonly property color accentText: Theme.workspaceIslandAccentText
     readonly property color transparent: Theme.transparent
 
     readonly property real defaultBarLen: 620

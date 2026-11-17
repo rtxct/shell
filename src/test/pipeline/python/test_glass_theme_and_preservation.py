@@ -7,13 +7,15 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 THEME_DIR = REPO_ROOT / "themes"
-DEFAULT_THEME = THEME_DIR / "theme.style.qml"
+TEMPLATE_THEME = THEME_DIR / "template-theme.style.qml"
+LEGACY_DEFAULT_THEME = THEME_DIR / "theme.style.qml"
 GLASS_THEME = THEME_DIR / "glass-theme.style.qml"
 QMLDIR = THEME_DIR / "qmldir"
 
 
 def test_both_themes_exist_and_original_not_deleted():
-    assert DEFAULT_THEME.is_file(), "Original theme.style.qml must not be deleted"
+    assert not LEGACY_DEFAULT_THEME.exists(), "Legacy theme.style.qml must be removed"
+    assert TEMPLATE_THEME.is_file(), "template-theme.style.qml must exist"
     assert GLASS_THEME.is_file(), "New glass-theme.style.qml must exist"
 
 
@@ -26,9 +28,12 @@ def test_qmldir_registers_both_themes_and_applies_glass():
         "Theme singleton must be applied to glass-theme.style.qml"
     )
 
-    # DefaultTheme must be preserved in qmldir pointing to theme.style.qml
-    assert any(re.match(r"^singleton\s+DefaultTheme\s+1\.0\s+theme\.style\.qml$", line) for line in lines), (
-        "DefaultTheme singleton must preserve theme.style.qml in qmldir"
+    # DefaultTheme must be removed and TemplateTheme must be registered in qmldir
+    assert not any(re.search(r"\bDefaultTheme\b", line) for line in lines), (
+        "DefaultTheme singleton must be removed from qmldir"
+    )
+    assert any(re.match(r"^singleton\s+TemplateTheme\s+1\.0\s+template-theme\.style\.qml$", line) for line in lines), (
+        "TemplateTheme singleton must point to template-theme.style.qml in qmldir"
     )
 
     # GlassTheme must also be explicitly registered
@@ -37,7 +42,7 @@ def test_qmldir_registers_both_themes_and_applies_glass():
     )
 
 
-def test_glass_theme_exposes_all_default_theme_tokens():
+def test_glass_and_template_theme_token_parity_and_style_coverage():
     def extract_props(file_path: Path) -> set[str]:
         content = file_path.read_text(encoding="utf-8")
         props = set()
@@ -48,11 +53,22 @@ def test_glass_theme_exposes_all_default_theme_tokens():
                 props.add(m.group(1))
         return props
 
-    default_props = extract_props(DEFAULT_THEME)
+    template_props = extract_props(TEMPLATE_THEME)
     glass_props = extract_props(GLASS_THEME)
 
-    missing = default_props - glass_props
-    assert missing == set(), f"Glass theme missing tokens: {missing}"
+    assert template_props == glass_props, (
+        f"Theme token mismatch: only_in_template={template_props - glass_props}, "
+        f"only_in_glass={glass_props - template_props}"
+    )
+
+    styles_dir = REPO_ROOT / "src" / "app" / "styles"
+    referenced_tokens = set()
+    for style_file in styles_dir.glob("*.style.qml"):
+        for m in re.finditer(r"\bTheme\.(\w+)\b", style_file.read_text(encoding="utf-8")):
+            referenced_tokens.add(m.group(1))
+
+    missing_in_themes = referenced_tokens - glass_props
+    assert missing_in_themes == set(), f"Missing Theme tokens referenced by styles: {missing_in_themes}"
 
 
 def test_glass_theme_uses_translucent_fills_and_specular_borders():

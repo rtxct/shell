@@ -8,12 +8,12 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color cardColor: Theme.surfaceWhite06
-    readonly property color cardHoverColor: Theme.surfaceWhite10
-    readonly property color cardBorderColor: Theme.glassInnerBevel
-    readonly property color glassRimHighlight: Theme.glassRimHighlight
+    readonly property color textPrimary: Theme.weatherCardTextPrimary
+    readonly property color textDim: Theme.weatherCardTextDim
+    readonly property color cardColor: Theme.weatherCardColor
+    readonly property color cardHoverColor: Theme.weatherCardHoverColor
+    readonly property color cardBorderColor: Theme.weatherCardBorderColor
+    readonly property color glassRimHighlight: Theme.weatherCardGlassRimHighlight
 
     readonly property real cardRadius: 14
     readonly property real cardHoverScale: 1.02

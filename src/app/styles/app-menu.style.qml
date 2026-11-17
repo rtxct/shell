@@ -8,18 +8,18 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color textPlaceholder: Theme.textPlaceholder
-    readonly property color textOnAccent: Theme.textOnAccent
-    readonly property color accent: Theme.accent
-    readonly property color cardBg: Theme.backgroundPrimary
-    readonly property color dragPillColor: Theme.surfaceWhite25
-    readonly property color searchBoxBg: Theme.surfaceWhite06
-    readonly property color searchBoxBorder: Theme.surfaceWhite10
-    readonly property color rowSelectedBg: Theme.surfaceWhite12
-    readonly property color rowHoverBg: Theme.surfaceWhite06
-    readonly property color rowDividerColor: Theme.surfaceWhite05
+    readonly property color textPrimary: Theme.appMenuTextPrimary
+    readonly property color textDim: Theme.appMenuTextDim
+    readonly property color textPlaceholder: Theme.appMenuTextPlaceholder
+    readonly property color textOnAccent: Theme.appMenuTextOnAccent
+    readonly property color accent: Theme.appMenuAccent
+    readonly property color cardBg: Theme.appMenuCardBg
+    readonly property color dragPillColor: Theme.appMenuDragPillColor
+    readonly property color searchBoxBg: Theme.appMenuSearchBoxBg
+    readonly property color searchBoxBorder: Theme.appMenuSearchBoxBorder
+    readonly property color rowSelectedBg: Theme.appMenuRowSelectedBg
+    readonly property color rowHoverBg: Theme.appMenuRowHoverBg
+    readonly property color rowDividerColor: Theme.appMenuRowDividerColor
     readonly property color transparent: Theme.transparent
 
     readonly property real floatWidth: 720
@@ -83,10 +83,10 @@ QtObject {
     readonly property real sortFooterHeight: 28
     readonly property real sortDividerMargin: 12
     readonly property real sortDividerHeight: 1
-    readonly property color sortDividerColor: Theme.borderWhite
+    readonly property color sortDividerColor: Theme.appMenuSortDividerColor
     readonly property int sortTextFontPx: 11
-    readonly property color sortTextColor: Theme.textDim
-    readonly property color sortTextHoverColor: Theme.textBright
+    readonly property color sortTextColor: Theme.appMenuSortTextColor
+    readonly property color sortTextHoverColor: Theme.appMenuSortTextHoverColor
     readonly property int sortAnimDurationMs: 180
     readonly property int sortFadeDurationMs: 150
 }

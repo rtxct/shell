@@ -8,25 +8,25 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color backgroundColor: Theme.backgroundPrimary
-    readonly property color scrimColor: Theme.backgroundPrimary
+    readonly property color backgroundColor: Theme.screenLockerBackgroundColor
+    readonly property color scrimColor: Theme.screenLockerScrimColor
     readonly property real scrimOpacity: 0.50
 
-    readonly property color clockColor: Theme.textBright
-    readonly property color dateColor: Theme.textSecondary
+    readonly property color clockColor: Theme.screenLockerClockColor
+    readonly property color dateColor: Theme.screenLockerDateColor
 
-    readonly property color userColor: Theme.textBright
-    readonly property color userIconColor: Theme.textDim
+    readonly property color userColor: Theme.screenLockerUserColor
+    readonly property color userIconColor: Theme.screenLockerUserIconColor
 
-    readonly property color inputColor: Theme.textBright
-    readonly property color placeholderColor: Theme.textPlaceholder
-    readonly property color inputBorder: Theme.surfaceWhite28
-    readonly property color inputBorderFocused: Theme.borderWhite
-    readonly property color inputBorderError: Theme.danger
+    readonly property color inputColor: Theme.screenLockerInputColor
+    readonly property color placeholderColor: Theme.screenLockerPlaceholderColor
+    readonly property color inputBorder: Theme.screenLockerInputBorder
+    readonly property color inputBorderFocused: Theme.screenLockerInputBorderFocused
+    readonly property color inputBorderError: Theme.screenLockerInputBorderError
 
-    readonly property color actionColor: Theme.textSecondary
-    readonly property color actionHoverColor: Theme.textBright
-    readonly property color actionDangerHoverColor: Theme.danger
+    readonly property color actionColor: Theme.screenLockerActionColor
+    readonly property color actionHoverColor: Theme.screenLockerActionHoverColor
+    readonly property color actionDangerHoverColor: Theme.screenLockerActionDangerHoverColor
 
     readonly property int fadeInDurationMs: 320
     readonly property int fadeOutDurationMs: 220

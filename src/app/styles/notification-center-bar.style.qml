@@ -8,24 +8,24 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color textSecondary: Theme.textSecondary
-    readonly property color textSubtle: Theme.textSubtle
-    readonly property color textOnAccent: Theme.textOnAccent
-    readonly property color accent: Theme.accent
-    readonly property color fill: Theme.backgroundPrimary
-    readonly property color danger: Theme.danger
-    readonly property color dividerColor: Theme.surfaceWhite08
-    readonly property color buttonBg: Theme.surfaceWhite06
-    readonly property color buttonHoverBg: Theme.surfaceWhite12
-    readonly property color buttonBorder: Theme.surfaceWhite10
-    readonly property color dangerClampedTint: Theme.dangerClampedTint18
-    readonly property color emptyBellColor: Theme.surfaceWhite20
-    readonly property color rowBg: Theme.surfaceWhite05
-    readonly property color rowHoverBg: Theme.surfaceWhite09
-    readonly property color rowBorder: Theme.surfaceWhite08
-    readonly property color urgencyLowBar: Theme.surfaceWhite25
+    readonly property color textPrimary: Theme.notificationCenterTextPrimary
+    readonly property color textDim: Theme.notificationCenterTextDim
+    readonly property color textSecondary: Theme.notificationCenterTextSecondary
+    readonly property color textSubtle: Theme.notificationCenterTextSubtle
+    readonly property color textOnAccent: Theme.notificationCenterTextOnAccent
+    readonly property color accent: Theme.notificationCenterAccent
+    readonly property color fill: Theme.notificationCenterFill
+    readonly property color danger: Theme.notificationCenterDanger
+    readonly property color dividerColor: Theme.notificationCenterDividerColor
+    readonly property color buttonBg: Theme.notificationCenterButtonBg
+    readonly property color buttonHoverBg: Theme.notificationCenterButtonHoverBg
+    readonly property color buttonBorder: Theme.notificationCenterButtonBorder
+    readonly property color dangerClampedTint: Theme.notificationCenterDangerClampedTint
+    readonly property color emptyBellColor: Theme.notificationCenterEmptyBellColor
+    readonly property color rowBg: Theme.notificationCenterRowBg
+    readonly property color rowHoverBg: Theme.notificationCenterRowHoverBg
+    readonly property color rowBorder: Theme.notificationCenterRowBorder
+    readonly property color urgencyLowBar: Theme.notificationCenterUrgencyLowBar
     readonly property color transparent: Theme.transparent
 
     readonly property real floatWidth: 460

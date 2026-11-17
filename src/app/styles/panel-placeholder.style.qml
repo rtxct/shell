@@ -8,6 +8,6 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textColor: Theme.textDim
+    readonly property color textColor: Theme.panelPlaceholderTextColor
     readonly property int fontPx: 18
 }

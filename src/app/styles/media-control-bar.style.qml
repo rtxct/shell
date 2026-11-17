@@ -8,22 +8,22 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color accent: Theme.accent
-    readonly property color fill: Theme.backgroundPrimary
-    readonly property color danger: Theme.danger
-    readonly property color circleHoverBg: Theme.surfaceWhite08
-    readonly property color circleIdleBorder: Theme.borderWhite
-    readonly property color sliderTrackBg: Theme.surfaceWhite16
-    readonly property color sliderThumbBorder: Theme.shadowBlack40
-    readonly property color dropActiveStrokeColor: Theme.transparent
-    readonly property color dropActiveFillColor: Theme.transparent
-    readonly property color glassSheenTop: Theme.glassSheenTop
-    readonly property color glassSheenMid: Theme.glassSheenMid
-    readonly property color glassSheenCore: Theme.glassSheenCore
-    readonly property color glassSheenBottom: Theme.glassSheenBottom
-    readonly property color glassInnerBevel: Theme.glassInnerBevel
+    readonly property color textPrimary: Theme.mediaControlBarTextPrimary
+    readonly property color textDim: Theme.mediaControlBarTextDim
+    readonly property color accent: Theme.mediaControlBarAccent
+    readonly property color fill: Theme.mediaControlBarFill
+    readonly property color danger: Theme.mediaControlBarDanger
+    readonly property color circleHoverBg: Theme.mediaControlBarCircleHoverBg
+    readonly property color circleIdleBorder: Theme.mediaControlBarCircleIdleBorder
+    readonly property color sliderTrackBg: Theme.mediaControlBarSliderTrackBg
+    readonly property color sliderThumbBorder: Theme.mediaControlBarSliderThumbBorder
+    readonly property color dropActiveStrokeColor: Theme.mediaControlBarDropActiveStrokeColor
+    readonly property color dropActiveFillColor: Theme.mediaControlBarDropActiveFillColor
+    readonly property color glassSheenTop: Theme.mediaControlBarGlassSheenTop
+    readonly property color glassSheenMid: Theme.mediaControlBarGlassSheenMid
+    readonly property color glassSheenCore: Theme.mediaControlBarGlassSheenCore
+    readonly property color glassSheenBottom: Theme.mediaControlBarGlassSheenBottom
+    readonly property color glassInnerBevel: Theme.mediaControlBarGlassInnerBevel
 
     readonly property real floatWidth: 500
     readonly property real floatHeight: 560

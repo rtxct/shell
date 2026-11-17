@@ -8,31 +8,31 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color textBright: Theme.textBright
-    readonly property color textOnAccent: Theme.textOnAccent
-    readonly property color accent: Theme.accent
-    readonly property color danger: Theme.danger
-    readonly property color searchBoxBg: Theme.surfaceWhite08
-    readonly property color searchBoxBorder: Theme.surfaceWhite14
-    readonly property color itemHoverBg: Theme.surfaceWhite10
-    readonly property color sliderTrackBg: Theme.surfaceWhite14
-    readonly property color buttonBg: Theme.surfaceWhite06
-    readonly property color buttonHoverBg: Theme.surfaceWhite12
-    readonly property color buttonBorder: Theme.surfaceWhite14
-    readonly property color mutedTint: Theme.dangerTint18
-    readonly property color cardBg: Theme.surfaceWhite05
-    readonly property color cardBorder: Theme.surfaceWhite12
-    readonly property color noteCardBg: Theme.surfaceWhite06
-    readonly property color noteCardBorder: Theme.surfaceWhite10
-    readonly property color editSwipeBg: Theme.editSwipeBg
+    readonly property color textPrimary: Theme.floatingPanelsTextPrimary
+    readonly property color textDim: Theme.floatingPanelsTextDim
+    readonly property color textBright: Theme.floatingPanelsTextBright
+    readonly property color textOnAccent: Theme.floatingPanelsTextOnAccent
+    readonly property color accent: Theme.floatingPanelsAccent
+    readonly property color danger: Theme.floatingPanelsDanger
+    readonly property color searchBoxBg: Theme.floatingPanelsSearchBoxBg
+    readonly property color searchBoxBorder: Theme.floatingPanelsSearchBoxBorder
+    readonly property color itemHoverBg: Theme.floatingPanelsItemHoverBg
+    readonly property color sliderTrackBg: Theme.floatingPanelsSliderTrackBg
+    readonly property color buttonBg: Theme.floatingPanelsButtonBg
+    readonly property color buttonHoverBg: Theme.floatingPanelsButtonHoverBg
+    readonly property color buttonBorder: Theme.floatingPanelsButtonBorder
+    readonly property color mutedTint: Theme.floatingPanelsMutedTint
+    readonly property color cardBg: Theme.floatingPanelsCardBg
+    readonly property color cardBorder: Theme.floatingPanelsCardBorder
+    readonly property color noteCardBg: Theme.floatingPanelsNoteCardBg
+    readonly property color noteCardBorder: Theme.floatingPanelsNoteCardBorder
+    readonly property color editSwipeBg: Theme.floatingPanelsEditSwipeBg
     readonly property color transparent: Theme.transparent
-    readonly property color cdSurfaceBg: Theme.circleOverrideExample
-    readonly property color cdGrooveBorder: Theme.surfaceWhite14
-    readonly property color cdSpindleBg: Theme.backgroundPrimary
-    readonly property color cdOverlayBg: Theme.shadowBlack40
-    readonly property color activeBadgeBg: Theme.accentGlowNearDock
+    readonly property color cdSurfaceBg: Theme.floatingPanelsCdSurfaceBg
+    readonly property color cdGrooveBorder: Theme.floatingPanelsCdGrooveBorder
+    readonly property color cdSpindleBg: Theme.floatingPanelsCdSpindleBg
+    readonly property color cdOverlayBg: Theme.floatingPanelsCdOverlayBg
+    readonly property color activeBadgeBg: Theme.floatingPanelsActiveBadgeBg
     readonly property color paletteBlue: Theme.paletteBlue
     readonly property color paletteOrange: Theme.paletteOrange
     readonly property color paletteRed: Theme.paletteRed

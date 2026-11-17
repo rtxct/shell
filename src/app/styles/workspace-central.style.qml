@@ -8,14 +8,14 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color accent: Theme.accent
-    readonly property color tileEmpty: Theme.surfaceWhite05
-    readonly property color tileOccupied: Theme.surfaceWhite12
-    readonly property color tileHover: Theme.surfaceWhite20
-    readonly property color urgentColor: Theme.danger
-    readonly property color accentText: Theme.textOnAccent
+    readonly property color textPrimary: Theme.workspaceCentralTextPrimary
+    readonly property color textDim: Theme.workspaceCentralTextDim
+    readonly property color accent: Theme.workspaceCentralAccent
+    readonly property color tileEmpty: Theme.workspaceCentralTileEmpty
+    readonly property color tileOccupied: Theme.workspaceCentralTileOccupied
+    readonly property color tileHover: Theme.workspaceCentralTileHover
+    readonly property color urgentColor: Theme.workspaceCentralUrgentColor
+    readonly property color accentText: Theme.workspaceCentralAccentText
 
     readonly property int columns: 5
     readonly property real tileWidth: 92

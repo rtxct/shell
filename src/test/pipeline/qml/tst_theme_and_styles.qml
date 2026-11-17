@@ -45,7 +45,7 @@ TestCase {
     function test_theme_colors_valid() {
         verifyStyleObject(Theme, "Theme")
         verifyStyleObject(GlassTheme, "GlassTheme")
-        verifyStyleObject(DefaultTheme, "DefaultTheme")
+        verifyStyleObject(TemplateTheme, "TemplateTheme")
         verifyColor(Theme.transparent, "Theme.transparent")
         compare(Theme.transparent.a, 0.0)
         verifyColor(Theme.backgroundPrimary, "Theme.backgroundPrimary")
@@ -69,8 +69,10 @@ TestCase {
         verify(GlassTheme.glassSheenBottom.a > 0.15, "GlassTheme glassSheenBottom must have caustic bottom reflection")
         verify(GlassTheme.glassInnerBevel.a > 0.15, "GlassTheme glassInnerBevel must have 3D inner bevel glow")
         verify(GlassTheme.glassRimHighlight.a > 0.50, "GlassTheme glassRimHighlight must have bright top crest highlight")
-        compare(DefaultTheme.glassSheenTop.a, 0.0, "DefaultTheme glassSheenTop must be transparent so pitch-black theme is unchanged")
-        compare(DefaultTheme.glassInnerBevel.a, 0.0, "DefaultTheme glassInnerBevel must be transparent")
+        compare(TemplateTheme.glassSheenTop.a, 0.0, "TemplateTheme glassSheenTop must be transparent for solid-color themes")
+        compare(TemplateTheme.glassInnerBevel.a, 0.0, "TemplateTheme glassInnerBevel must be transparent for solid-color themes")
+        compare(TemplateTheme.backgroundPrimary.a, 1.0, "TemplateTheme backgroundPrimary must be opaque for solid-color themes")
+        verify(TemplateTheme.weatherCardBorderColor.a > 0.0, "TemplateTheme weatherCardBorderColor must remain visible in solid mode")
     }
 
     function test_all_24_style_singletons() {

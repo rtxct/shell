@@ -8,10 +8,10 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color accent: Theme.accent
-    readonly property color rowHover: Theme.surfaceWhite06
-    readonly property color rowCurrent: Theme.surfaceWhite10
+    readonly property color textPrimary: Theme.locationPickerTextPrimary
+    readonly property color accent: Theme.locationPickerAccent
+    readonly property color rowHover: Theme.locationPickerRowHover
+    readonly property color rowCurrent: Theme.locationPickerRowCurrent
     readonly property color transparent: Theme.transparent
 
     readonly property real rowHeight: 28

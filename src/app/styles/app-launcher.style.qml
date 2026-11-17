@@ -8,18 +8,18 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color accent: Theme.accent
-    readonly property color fill: Theme.backgroundPrimary
-    readonly property color circleHoverBg: Theme.surfaceWhite08
-    readonly property color circleIdleBorder: Theme.borderWhite
+    readonly property color textPrimary: Theme.appLauncherTextPrimary
+    readonly property color textDim: Theme.appLauncherTextDim
+    readonly property color accent: Theme.appLauncherAccent
+    readonly property color fill: Theme.appLauncherFill
+    readonly property color circleHoverBg: Theme.appLauncherCircleHoverBg
+    readonly property color circleIdleBorder: Theme.appLauncherCircleIdleBorder
     readonly property color transparent: Theme.transparent
-    readonly property color glassSheenTop: Theme.glassSheenTop
-    readonly property color glassSheenMid: Theme.glassSheenMid
-    readonly property color glassSheenCore: Theme.glassSheenCore
-    readonly property color glassSheenBottom: Theme.glassSheenBottom
-    readonly property color glassInnerBevel: Theme.glassInnerBevel
+    readonly property color glassSheenTop: Theme.appLauncherGlassSheenTop
+    readonly property color glassSheenMid: Theme.appLauncherGlassSheenMid
+    readonly property color glassSheenCore: Theme.appLauncherGlassSheenCore
+    readonly property color glassSheenBottom: Theme.appLauncherGlassSheenBottom
+    readonly property color glassInnerBevel: Theme.appLauncherGlassInnerBevel
 
     readonly property real floatWidth: 440
     readonly property real floatHeight: 520

@@ -8,25 +8,25 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color textOnAccent: Theme.textOnAccent
-    readonly property color accent: Theme.accent
-    readonly property color fill: Theme.backgroundPrimary
-    readonly property color danger: Theme.danger
-    readonly property color cardBg: Theme.surfaceWhite07
-    readonly property color inputBg: Theme.surfaceWhite08
-    readonly property color inputBorder: Theme.surfaceWhite16
-    readonly property color deleteHoverTint: Theme.dangerTint25
-    readonly property color addBtnBg: Theme.surfaceWhite06
-    readonly property color addBtnHoverBg: Theme.surfaceWhite12
-    readonly property color addBtnBorder: Theme.surfaceWhite14
-    readonly property color itemRowBg: Theme.surfaceWhite09
-    readonly property color editSwipeTint: Theme.editTint25
-    readonly property color editSwipeIcon: Theme.editSwipeIcon
-    readonly property color editInputBorder: Theme.surfaceWhite12
+    readonly property color textPrimary: Theme.stickNotesBarTextPrimary
+    readonly property color textDim: Theme.stickNotesBarTextDim
+    readonly property color textOnAccent: Theme.stickNotesBarTextOnAccent
+    readonly property color accent: Theme.stickNotesBarAccent
+    readonly property color fill: Theme.stickNotesBarFill
+    readonly property color danger: Theme.stickNotesBarDanger
+    readonly property color cardBg: Theme.stickNotesBarCardBg
+    readonly property color inputBg: Theme.stickNotesBarInputBg
+    readonly property color inputBorder: Theme.stickNotesBarInputBorder
+    readonly property color deleteHoverTint: Theme.stickNotesBarDeleteHoverTint
+    readonly property color addBtnBg: Theme.stickNotesBarAddBtnBg
+    readonly property color addBtnHoverBg: Theme.stickNotesBarAddBtnHoverBg
+    readonly property color addBtnBorder: Theme.stickNotesBarAddBtnBorder
+    readonly property color itemRowBg: Theme.stickNotesBarItemRowBg
+    readonly property color editSwipeTint: Theme.stickNotesBarEditSwipeTint
+    readonly property color editSwipeIcon: Theme.stickNotesBarEditSwipeIcon
+    readonly property color editInputBorder: Theme.stickNotesBarEditInputBorder
     readonly property color transparent: Theme.transparent
-    readonly property color textBright: Theme.textBright
+    readonly property color textBright: Theme.stickNotesBarTextBright
     readonly property color paletteBlue: Theme.paletteBlue
     readonly property color paletteOrange: Theme.paletteOrange
     readonly property color paletteRed: Theme.paletteRed

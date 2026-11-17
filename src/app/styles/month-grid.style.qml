@@ -8,13 +8,13 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textMuted: Theme.textMuted
-    readonly property color accent: Theme.accent
-    readonly property color todayText: Theme.textOnAccent
-    readonly property color hoverCircleColor: Theme.surfaceWhite12
-    readonly property color selectedCircleColor: Theme.surfaceWhite20
-    readonly property color textBright: Theme.textBright
+    readonly property color textPrimary: Theme.monthGridTextPrimary
+    readonly property color textMuted: Theme.monthGridTextMuted
+    readonly property color accent: Theme.monthGridAccent
+    readonly property color todayText: Theme.monthGridTodayText
+    readonly property color hoverCircleColor: Theme.monthGridHoverCircleColor
+    readonly property color selectedCircleColor: Theme.monthGridSelectedCircleColor
+    readonly property color textBright: Theme.monthGridTextBright
     readonly property int defaultCellSize: 30
     readonly property real headerHeight: 30
     readonly property int titleFontPx: 14

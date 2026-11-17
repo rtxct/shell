@@ -8,7 +8,7 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color fill: Theme.backgroundPrimary
+    readonly property color fill: Theme.stripFill
     readonly property real thickness: 6
     readonly property real defaultLength: 720
     readonly property real slant: 0

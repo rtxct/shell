@@ -8,11 +8,11 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color accent: Theme.accent
-    readonly property color cardColor: Theme.surfaceWhite06
-    readonly property color cardHoverColor: Theme.surfaceWhite10
+    readonly property color textPrimary: Theme.eventsListTextPrimary
+    readonly property color textDim: Theme.eventsListTextDim
+    readonly property color accent: Theme.eventsListAccent
+    readonly property color cardColor: Theme.eventsListCardColor
+    readonly property color cardHoverColor: Theme.eventsListCardHoverColor
 
     readonly property real layoutSpacing: 10
     readonly property real headerHeight: 24

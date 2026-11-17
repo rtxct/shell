@@ -8,9 +8,9 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color fill: Theme.backgroundPrimary
+    readonly property color fill: Theme.sideBarFill
     readonly property color transparent: Theme.transparent
-    readonly property color textPrimary: Theme.textPrimary
+    readonly property color textPrimary: Theme.sideBarTextPrimary
     readonly property int panelFontPx: 15
 
     readonly property real floatWidth: 720
@@ -36,11 +36,11 @@ QtObject {
 
     // ── Caelestia Performance Panel Tokens (TopRightBar) ──
     readonly property real perfOverviewHeight: 260
-    readonly property color perfArcPrimary: Theme.accent
-    readonly property color perfArcSecondary: Theme.textSecondary
-    readonly property color perfTrackPrimary: Theme.surfaceWhite14
-    readonly property color perfTrackSecondary: Theme.surfaceWhite08
-    readonly property color perfTextDim: Theme.textDim
+    readonly property color perfArcPrimary: Theme.sideBarPerfArcPrimary
+    readonly property color perfArcSecondary: Theme.sideBarPerfArcSecondary
+    readonly property color perfTrackPrimary: Theme.sideBarPerfTrackPrimary
+    readonly property color perfTrackSecondary: Theme.sideBarPerfTrackSecondary
+    readonly property color perfTextDim: Theme.sideBarPerfTextDim
     readonly property real perfResourceSize: 160
     readonly property real perfPrimaryScale: 1.2
     readonly property real perfStrokeThickness: 10
@@ -53,15 +53,15 @@ QtObject {
     readonly property real perfGapLabelTopMargin: 6
     readonly property int perfPollIntervalMs: 2000
     readonly property int perfAnimDurationMs: 400
-    readonly property color perfCardBg: Theme.surfaceWhite06
-    readonly property color perfCardHoverBg: Theme.surfaceWhite12
-    readonly property color perfRowHoverBg: Theme.surfaceWhite25
+    readonly property color perfCardBg: Theme.sideBarPerfCardBg
+    readonly property color perfCardHoverBg: Theme.sideBarPerfCardHoverBg
+    readonly property color perfRowHoverBg: Theme.sideBarPerfRowHoverBg
     readonly property real perfRowRadius: 5
-    readonly property color perfCardBorder: Theme.surfaceWhite14
-    readonly property color perfCardHoverBorder: Theme.borderWhite
-    readonly property color perfCardPressedBg: Theme.surfaceWhite20
-    readonly property color perfGraphFill: Theme.surfaceWhite10
-    readonly property color perfDanger: Theme.danger
+    readonly property color perfCardBorder: Theme.sideBarPerfCardBorder
+    readonly property color perfCardHoverBorder: Theme.sideBarPerfCardHoverBorder
+    readonly property color perfCardPressedBg: Theme.sideBarPerfCardPressedBg
+    readonly property color perfGraphFill: Theme.sideBarPerfGraphFill
+    readonly property color perfDanger: Theme.sideBarPerfDanger
     readonly property real perfCircleHoverScale: 1.06
     readonly property real perfCirclePressedScale: 0.94
     readonly property real perfCardHoverScale: 1.03

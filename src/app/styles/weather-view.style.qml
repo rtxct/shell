@@ -8,15 +8,15 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color textSecondary: Theme.textSecondary
-    readonly property color textSubtle: Theme.textSubtle
-    readonly property color accent: Theme.accent
-    readonly property color cardColor: Theme.surfaceWhite06
-    readonly property color cardHoverColor: Theme.surfaceWhite10
-    readonly property color dividerColor: Theme.surfaceWhite08
-    readonly property color scrollBarColor: Theme.surfaceWhite20
+    readonly property color textPrimary: Theme.weatherViewTextPrimary
+    readonly property color textDim: Theme.weatherViewTextDim
+    readonly property color textSecondary: Theme.weatherViewTextSecondary
+    readonly property color textSubtle: Theme.weatherViewTextSubtle
+    readonly property color accent: Theme.weatherViewAccent
+    readonly property color cardColor: Theme.weatherViewCardColor
+    readonly property color cardHoverColor: Theme.weatherViewCardHoverColor
+    readonly property color dividerColor: Theme.weatherViewDividerColor
+    readonly property color scrollBarColor: Theme.weatherViewScrollBarColor
 
     readonly property string iconFont: "JetBrainsMono Nerd Font"
     readonly property real headerPaddingX: 16

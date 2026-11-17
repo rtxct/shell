@@ -8,26 +8,26 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color background: Theme.backgroundPrimary
-    readonly property color urgencyCritical: Theme.danger
-    readonly property color urgencyNormal: Theme.accent
-    readonly property color urgencyLow: Theme.borderWhite
-    readonly property color risingBorder: Theme.borderWhite
-    readonly property color bubbleShine: Theme.surfaceWhite75
-    readonly property color iconBadgeBg: Theme.surfaceWhite08
-    readonly property color iconBadgeBorder: Theme.surfaceWhite12
-    readonly property color summaryText: Theme.textPrimary
-    readonly property color bodyText: Theme.textSecondary
-    readonly property color closeTextIdle: Theme.textMuted
-    readonly property color closeTextHover: Theme.textBright
-    readonly property color closeBtnHoverBg: Theme.surfaceWhite12
-    readonly property color closeBtnIdleBg: Theme.transparent
-    readonly property color glassSheenTop: Theme.glassSheenTop
-    readonly property color glassSheenMid: Theme.glassSheenMid
-    readonly property color glassSheenCore: Theme.glassSheenCore
-    readonly property color glassSheenBottom: Theme.glassSheenBottom
-    readonly property color glassInnerBevel: Theme.glassInnerBevel
-    readonly property color glassRimHighlight: Theme.glassRimHighlight
+    readonly property color background: Theme.notificationCardBackground
+    readonly property color urgencyCritical: Theme.notificationCardUrgencyCritical
+    readonly property color urgencyNormal: Theme.notificationCardUrgencyNormal
+    readonly property color urgencyLow: Theme.notificationCardUrgencyLow
+    readonly property color risingBorder: Theme.notificationCardRisingBorder
+    readonly property color bubbleShine: Theme.notificationCardBubbleShine
+    readonly property color iconBadgeBg: Theme.notificationCardIconBadgeBg
+    readonly property color iconBadgeBorder: Theme.notificationCardIconBadgeBorder
+    readonly property color summaryText: Theme.notificationCardSummaryText
+    readonly property color bodyText: Theme.notificationCardBodyText
+    readonly property color closeTextIdle: Theme.notificationCardCloseTextIdle
+    readonly property color closeTextHover: Theme.notificationCardCloseTextHover
+    readonly property color closeBtnHoverBg: Theme.notificationCardCloseBtnHoverBg
+    readonly property color closeBtnIdleBg: Theme.notificationCardCloseBtnIdleBg
+    readonly property color glassSheenTop: Theme.notificationCardGlassSheenTop
+    readonly property color glassSheenMid: Theme.notificationCardGlassSheenMid
+    readonly property color glassSheenCore: Theme.notificationCardGlassSheenCore
+    readonly property color glassSheenBottom: Theme.notificationCardGlassSheenBottom
+    readonly property color glassInnerBevel: Theme.notificationCardGlassInnerBevel
+    readonly property color glassRimHighlight: Theme.notificationCardGlassRimHighlight
     readonly property color transparent: Theme.transparent
     readonly property real cardWidth: 350
     readonly property real cardHeight: 54

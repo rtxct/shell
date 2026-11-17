@@ -1,3 +1,3 @@
 singleton Theme 1.0 glass-theme.style.qml
 singleton GlassTheme 1.0 glass-theme.style.qml
-singleton DefaultTheme 1.0 theme.style.qml
+singleton TemplateTheme 1.0 template-theme.style.qml

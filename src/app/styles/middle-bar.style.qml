@@ -8,7 +8,7 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color textPrimary: Theme.textPrimary
+    readonly property color textPrimary: Theme.middleBarTextPrimary
 
     readonly property real idleLen: 300
     readonly property real idleDepth: 44

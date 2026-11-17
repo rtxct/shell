@@ -8,8 +8,8 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color dividerColor: Theme.surfaceWhite08
-    readonly property color weatherBg: Theme.weatherPanelSurface
+    readonly property color dividerColor: Theme.calendarPanelDividerColor
+    readonly property color weatherBg: Theme.calendarPanelWeatherBg
 
     readonly property real leftColumnWidth: 270
     readonly property real columnGap: 32

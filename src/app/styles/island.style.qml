@@ -8,10 +8,10 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color fill: Theme.backgroundPrimary
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color accent: Theme.accent
+    readonly property color fill: Theme.islandFill
+    readonly property color textPrimary: Theme.islandTextPrimary
+    readonly property color textDim: Theme.islandTextDim
+    readonly property color accent: Theme.islandAccent
 
     readonly property real verticalFloatWidth: 520
     readonly property real verticalFloatHeight: 440

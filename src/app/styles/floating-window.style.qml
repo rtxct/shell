@@ -8,23 +8,23 @@ import QtQuick
 import "../../../themes"
 
 QtObject {
-    readonly property color background: Theme.backgroundPrimary
-    readonly property color accent: Theme.accent
-    readonly property color danger: Theme.danger
-    readonly property color textPrimary: Theme.textPrimary
-    readonly property color textDim: Theme.textDim
-    readonly property color borderDragging: Theme.accentBorderDragging
-    readonly property color borderIdle: Theme.borderWhite
-    readonly property color innerGlowNearDock: Theme.accentGlowNearDock
-    readonly property color innerGlowIdle: Theme.surfaceWhite04
-    readonly property color titlebarDivider: Theme.surfaceWhite08
-    readonly property color closeBtnHoverBg: Theme.dangerTint20
-    readonly property color glassSheenTop: Theme.glassSheenTop
-    readonly property color glassSheenMid: Theme.glassSheenMid
-    readonly property color glassSheenCore: Theme.glassSheenCore
-    readonly property color glassSheenBottom: Theme.glassSheenBottom
-    readonly property color glassInnerBevel: Theme.glassInnerBevel
-    readonly property color glassRimHighlight: Theme.glassRimHighlight
+    readonly property color background: Theme.floatingWindowBackground
+    readonly property color accent: Theme.floatingWindowAccent
+    readonly property color danger: Theme.floatingWindowDanger
+    readonly property color textPrimary: Theme.floatingWindowTextPrimary
+    readonly property color textDim: Theme.floatingWindowTextDim
+    readonly property color borderDragging: Theme.floatingWindowBorderDragging
+    readonly property color borderIdle: Theme.floatingWindowBorderIdle
+    readonly property color innerGlowNearDock: Theme.floatingWindowInnerGlowNearDock
+    readonly property color innerGlowIdle: Theme.floatingWindowInnerGlowIdle
+    readonly property color titlebarDivider: Theme.floatingWindowTitlebarDivider
+    readonly property color closeBtnHoverBg: Theme.floatingWindowCloseBtnHoverBg
+    readonly property color glassSheenTop: Theme.floatingWindowGlassSheenTop
+    readonly property color glassSheenMid: Theme.floatingWindowGlassSheenMid
+    readonly property color glassSheenCore: Theme.floatingWindowGlassSheenCore
+    readonly property color glassSheenBottom: Theme.floatingWindowGlassSheenBottom
+    readonly property color glassInnerBevel: Theme.floatingWindowGlassInnerBevel
+    readonly property color glassRimHighlight: Theme.floatingWindowGlassRimHighlight
     readonly property color transparent: Theme.transparent
 
     readonly property real defaultWidth: 440
