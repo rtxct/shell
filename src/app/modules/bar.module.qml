@@ -432,6 +432,7 @@ Scope {
                 barX: scope.barX
                 barW: scope.barW
                 stripH: topStrip.thickness
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 visible: scope.isTopmostScreen
             }
@@ -442,6 +443,7 @@ Scope {
                 barX: scope.barX
                 barW: scope.barW
                 stripH: topStrip.thickness
+                barsHidden: scope.barsHidden
                 floatManager: floatManager
                 visible: scope.isTopmostScreen
             }

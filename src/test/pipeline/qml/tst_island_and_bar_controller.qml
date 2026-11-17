@@ -137,6 +137,13 @@ Item {
             compare(leftWing.trigger, "click")
             verify(leftWing.zoneW >= 40)
 
+            leftWing.barsHidden = false
+            compare(leftWing.baseH, leftWing.pillH)
+            leftWing.barsHidden = true
+            compare(leftWing.baseH, leftWing.stripH)
+            compare(leftWing.baseSlant, 0)
+            leftWing.barsHidden = false
+
             // Circle two-phase trajectory math
             compare(circleOuter.offset, circleOuter.innerOffset + 2 * circleOuter.spacing)
             compare(circleOuter.pA, 0)

@@ -2,7 +2,7 @@
 // File: components/side-bar.component.qml
 // Purpose: Hover-triggered edge wing flyout container that spawns a travelling droplet and expands into a full-width top panel.
 // Public API:
-//   - Properties: ctl, barX, barW, stripH, side, trigger, fill, expandedH, expandedSlant, radius, flare, zoneInset ...
+//   - Properties: ctl, barX, barW, stripH, barsHidden, side, trigger, fill, expandedH, expandedSlant, radius, flare, zoneInset ...
 //   - Functions:  clamp01(v), request()
 // Dependencies: QtQuick, "../styles"
 // ============================================================================
@@ -22,6 +22,7 @@ Item {
     property real barX: 0
     property real barW: 720
     property real stripH: 6
+    property bool barsHidden: false
     property string side: "left"
     property bool isFloatingWindow: false
     property var floatingWindow: null
@@ -77,9 +78,11 @@ Item {
     //   as the open strip bar panel (`collapsedH -> expandedH`, `pillW -> barW`).
     readonly property real maxWingLen: Math.max(0, (barW - pillW) / 2)
     readonly property real curWingLen: expand > 0 ? 0 : maxWingLen * (1.0 - travel)
-    readonly property real collapsedH: Math.max(2, stripH + 1)
-    readonly property real baseH: pillH - (pillH - collapsedH) * travel
-    readonly property real baseSlant: pillSlant * (1.0 - travel)
+    readonly property real collapsedH: root.barsHidden ? Math.max(2, stripH) : Math.max(2, stripH + 1)
+    readonly property real effectivePillH: root.barsHidden ? collapsedH : pillH
+    readonly property real effectivePillSlant: root.barsHidden ? 0 : pillSlant
+    readonly property real baseH: effectivePillH - (effectivePillH - collapsedH) * travel
+    readonly property real baseSlant: effectivePillSlant * (1.0 - travel)
 
     readonly property real dw: pillW + (barW - pillW) * expand
     readonly property real dh: baseH + (expandedH - baseH) * expand
@@ -290,7 +293,7 @@ Item {
         y: root.stripH - (root.pillH - root.collapsedH) * root.travel
         width: root.pillW
         height: Math.max(0, root.pillH - root.stripH - 6)
-        opacity: (!root.isFloatingWindow && root.mine && !root.isDetaching && root.expand <= 0.01) ? Math.max(0, 1 - root.travel * 1.35) : 0
+        opacity: (!root.barsHidden && !root.isFloatingWindow && root.mine && !root.isDetaching && root.expand <= 0.01) ? Math.max(0, 1 - root.travel * 1.35) : 0
         visible: opacity > 0.01 && root.ctl && root.ctl.now !== undefined
 
         Text {
