@@ -172,19 +172,46 @@ function stripWorkspaces(items, max) {
 
 /**
  * Parse `niri msg --json workspaces` output into sorted workspace items.
+ * Supports multi-monitor outputs, labeling workspaces as e.g. "1-1", "1-2", "2-1", "2-2"
+ * and sorting sequentially by monitor then workspace index.
  */
 function parseNiriWorkspaces(text) {
     try {
         var arr = JSON.parse(text)
         if (!Array.isArray(arr)) return null
-        arr.sort(function (a, b) { return a.idx - b.idx })
+
+        var outputs = []
+        var outputMap = {}
+        for (var i = 0; i < arr.length; i++) {
+            var outName = arr[i].output || ""
+            if (outName && outputMap[outName] === undefined) {
+                outputs.push(outName)
+                outputMap[outName] = outputs.length
+            }
+        }
+        var multiMonitor = outputs.length > 1
+
+        arr.sort(function (a, b) {
+            if (multiMonitor) {
+                var mA = outputMap[a.output || ""] || 1
+                var mB = outputMap[b.output || ""] || 1
+                if (mA !== mB) return mA - mB
+            }
+            return (a.idx || 0) - (b.idx || 0)
+        })
+
         return arr.map(function (w) {
+            var mIdx = outputMap[w.output || ""] || 1
+            var defaultLabel = multiMonitor ? (mIdx + "-" + w.idx) : String(w.idx)
             return {
                 id: w.id,
                 number: w.idx,
-                name: w.name || String(w.idx),
-                label: w.name ? w.name.slice(0, 3) : String(w.idx),
+                output: w.output || "",
+                outputIndex: mIdx,
+                name: w.name || defaultLabel,
+                label: w.name ? w.name.slice(0, 3) : defaultLabel,
                 focused: !!w.is_focused,
+                isActive: !!w.is_active,
                 occupied: w.active_window_id !== null && w.active_window_id !== undefined,
                 urgent: !!w.is_urgent
             }

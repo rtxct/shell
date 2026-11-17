@@ -22,7 +22,12 @@ Item {
     property var items: []
 
     function activate(item) {
-        act.command = ["niri", "msg", "action", "focus-workspace", String(item.number)]
+        if (!item) return
+        if (item.output) {
+            act.command = ["sh", "-c", "niri msg action focus-monitor \"$1\" && niri msg action focus-workspace \"$2\"", "--", String(item.output), String(item.number)]
+        } else {
+            act.command = ["niri", "msg", "action", "focus-workspace", String(item.number)]
+        }
         act.running = true
     }
 
@@ -38,7 +43,12 @@ Item {
         command: ["niri", "msg", "--json", "workspaces"]
         stdout: StdioCollector { onStreamFinished: root.parse(this.text) }
     }
-    Process { id: act }
+    Process {
+        id: act
+        onExited: {
+            if (!poll.running) poll.running = true
+        }
+    }
 
     Timer {
         interval: root.pollIntervalMs

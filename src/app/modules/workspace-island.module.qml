@@ -103,7 +103,7 @@ Island {
                     anchors.centerIn: parent
                     text: cell.modelData.label
                     color: cell.modelData.focused ? root.accentText : root.fg
-                    font.pixelSize: WorkspaceIslandStyle.labelFontPx
+                    font.pixelSize: (cell.modelData.label && cell.modelData.label.length > 2) ? (WorkspaceIslandStyle.labelFontPx - 2) : WorkspaceIslandStyle.labelFontPx
                     font.weight: Font.DemiBold
                 }
             }

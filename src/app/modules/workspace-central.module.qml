@@ -73,7 +73,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: WorkspaceCentralStyle.stateLabelBottomMargin
-                    text: tile.modelData.focused ? "focused" : (tile.modelData.occupied ? "open" : "empty")
+                    text: tile.modelData.focused ? "focused" : (tile.modelData.isActive ? "active" : (tile.modelData.occupied ? "open" : "empty"))
                     color: tile.modelData.focused ? root.accentText : root.dim
                     font.pixelSize: WorkspaceCentralStyle.stateLabelFontPx
                 }

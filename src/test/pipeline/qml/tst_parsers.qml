@@ -183,6 +183,33 @@ TestCase {
         compare(stripWs.length, 2)
         compare(stripWs[0].number, 1)
         compare(stripWs[1].number, 3)
+
+        // Multi-monitor Niri workspaces: grouped by output, labeled "1-1", "1-2", "2-1", "2-2"
+        var niriMultiWs = ServiceParsers.parseNiriWorkspaces(JSON.stringify([
+            { id: 1, idx: 2, output: "DP-1", is_focused: false, is_active: false, active_window_id: 10 },
+            { id: 2, idx: 1, output: "HDMI-A-1", is_focused: false, is_active: true, active_window_id: 20 },
+            { id: 3, idx: 1, output: "DP-1", is_focused: true, is_active: true, active_window_id: 30 },
+            { id: 4, idx: 2, output: "HDMI-A-1", is_focused: false, is_active: false, active_window_id: null }
+        ]))
+        compare(niriMultiWs.length, 4)
+        compare(niriMultiWs[0].label, "1-1")
+        compare(niriMultiWs[0].output, "DP-1")
+        compare(niriMultiWs[0].number, 1)
+        compare(niriMultiWs[0].focused, true)
+        compare(niriMultiWs[0].isActive, true)
+
+        compare(niriMultiWs[1].label, "1-2")
+        compare(niriMultiWs[1].output, "DP-1")
+        compare(niriMultiWs[1].number, 2)
+
+        compare(niriMultiWs[2].label, "2-1")
+        compare(niriMultiWs[2].output, "HDMI-A-1")
+        compare(niriMultiWs[2].number, 1)
+        compare(niriMultiWs[2].isActive, true)
+
+        compare(niriMultiWs[3].label, "2-2")
+        compare(niriMultiWs[3].output, "HDMI-A-1")
+        compare(niriMultiWs[3].number, 2)
     }
 
     function test_config_parsers_hot_reload_and_partial_fallback() {
