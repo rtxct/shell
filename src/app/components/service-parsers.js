@@ -391,9 +391,10 @@ function parseLayoutConfig(text, prevState) {
     var out = {
         windowGap: prevState && typeof prevState.windowGap === "number" ? prevState.windowGap : 16,
         barMaxWidth: prevState && typeof prevState.barMaxWidth === "number" ? prevState.barMaxWidth : 720,
-        screenMargin: prevState && typeof prevState.screenMargin === "number" ? prevState.screenMargin : 40,
         leftBarMaxLength: prevState && typeof prevState.leftBarMaxLength === "number" ? prevState.leftBarMaxLength : 620,
         launcherX: prevState && typeof prevState.launcherX === "number" ? prevState.launcherX : 190,
+        topGap: prevState && typeof prevState.topGap === "number" ? prevState.topGap : 16,
+        leftGap: prevState && typeof prevState.leftGap === "number" ? prevState.leftGap : 16,
         bottomGap: prevState && typeof prevState.bottomGap === "number" ? prevState.bottomGap : 18,
         rightGap: prevState && typeof prevState.rightGap === "number" ? prevState.rightGap : 18
     }
@@ -403,12 +404,14 @@ function parseLayoutConfig(text, prevState) {
             out.windowGap = cfg.windowGap
         if (typeof cfg.barMaxWidth === "number" && cfg.barMaxWidth > 0)
             out.barMaxWidth = cfg.barMaxWidth
-        if (typeof cfg.screenMargin === "number" && cfg.screenMargin >= 0)
-            out.screenMargin = cfg.screenMargin
         if (typeof cfg.leftBarMaxLength === "number" && cfg.leftBarMaxLength > 0)
             out.leftBarMaxLength = cfg.leftBarMaxLength
         if (typeof cfg.launcherX === "number" && cfg.launcherX >= 0)
             out.launcherX = cfg.launcherX
+        if (typeof cfg.topGap === "number" && cfg.topGap >= 0)
+            out.topGap = cfg.topGap
+        if (typeof cfg.leftGap === "number" && cfg.leftGap >= 0)
+            out.leftGap = cfg.leftGap
         if (typeof cfg.bottomGap === "number" && cfg.bottomGap >= 0)
             out.bottomGap = cfg.bottomGap
         if (typeof cfg.rightGap === "number" && cfg.rightGap >= 0)

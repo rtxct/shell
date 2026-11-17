@@ -279,17 +279,19 @@ TestCase {
         var layout = ServiceParsers.parseLayoutConfig(JSON.stringify({
             windowGap: 20,
             barMaxWidth: 800,
-            screenMargin: 48,
             leftBarMaxLength: 680,
             launcherX: 210,
+            topGap: 18,
+            leftGap: 20,
             bottomGap: 22,
             rightGap: 24
         }), null)
         compare(layout.windowGap, 20)
         compare(layout.barMaxWidth, 800)
-        compare(layout.screenMargin, 48)
         compare(layout.leftBarMaxLength, 680)
         compare(layout.launcherX, 210)
+        compare(layout.topGap, 18)
+        compare(layout.leftGap, 20)
         compare(layout.bottomGap, 22)
         compare(layout.rightGap, 24)
     }

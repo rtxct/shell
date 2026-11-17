@@ -101,9 +101,10 @@ def test_all_config_files_have_schemas():
             {
                 "windowGap": 16,
                 "barMaxWidth": 720,
-                "screenMargin": 40,
                 "leftBarMaxLength": 620,
                 "launcherX": 190,
+                "topGap": 16,
+                "leftGap": 16,
                 "bottomGap": 18,
                 "rightGap": 18,
                 "unexpectedKey": 123,
@@ -180,9 +181,10 @@ def test_config_defaults_match_pre_refactor_baseline():
     assert layout == {
         "windowGap": 16,
         "barMaxWidth": 720,
-        "screenMargin": 40,
         "leftBarMaxLength": 620,
         "launcherX": 190,
+        "topGap": 16,
+        "leftGap": 16,
         "bottomGap": 18,
         "rightGap": 18,
     }

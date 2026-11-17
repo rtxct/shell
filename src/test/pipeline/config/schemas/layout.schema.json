@@ -6,9 +6,10 @@
   "required": [
     "windowGap",
     "barMaxWidth",
-    "screenMargin",
     "leftBarMaxLength",
     "launcherX",
+    "topGap",
+    "leftGap",
     "bottomGap",
     "rightGap"
   ],
@@ -21,15 +22,19 @@
       "type": "number",
       "minimum": 100
     },
-    "screenMargin": {
-      "type": "number",
-      "minimum": 0
-    },
     "leftBarMaxLength": {
       "type": "number",
       "minimum": 100
     },
     "launcherX": {
+      "type": "number",
+      "minimum": 0
+    },
+    "topGap": {
+      "type": "number",
+      "minimum": 0
+    },
+    "leftGap": {
       "type": "number",
       "minimum": 0
     },

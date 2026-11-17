@@ -29,8 +29,8 @@ def test_bar_declares_perimeter_edge_properties():
 def test_bar_reserves_pad_barless_edges():
     content = BAR_QML.read_text(encoding="utf-8")
     # Left bar reserve:
-    assert "implicitWidth: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.windowGap) : scope.windowGap" in content
-    assert "exclusiveZone: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.windowGap) : scope.windowGap" in content
+    assert "implicitWidth: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.leftGap) : scope.windowGap" in content
+    assert "exclusiveZone: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.leftGap) : scope.windowGap" in content
     # Right bar reserve:
     assert "implicitWidth: scope.isRightmostScreen ? scope.rightGap : scope.windowGap" in content
     assert "exclusiveZone: scope.isRightmostScreen ? scope.rightGap : scope.windowGap" in content

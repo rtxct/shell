@@ -2,7 +2,7 @@
 // File: modules/bar.module.qml
 // Purpose: Per-monitor Wayland LayerShell window orchestrator managing space reservation surfaces, bar canvas, input masks, and floating window layer.
 // Public API:
-//   - Properties: modelData, weather, events, workspaces, audio, sticknotes, notifications, screenW, screenH, windowGap, screenMargin, barMaxWidth, isLeftmostScreen, isRightmostScreen, isTopmostScreen, isBottommostScreen ...
+//   - Properties: modelData, weather, events, workspaces, audio, sticknotes, notifications, screenW, screenH, windowGap, barMaxWidth, topGap, leftGap, bottomGap, rightGap, isLeftmostScreen, isRightmostScreen, isTopmostScreen, isBottommostScreen ...
 //   - Functions:  applyLayoutConfig(text), closeAll()
 // Dependencies: Quickshell, "../components", "../theme", Quickshell.Io, Quickshell.Wayland, QtQuick
 // ============================================================================
@@ -45,18 +45,18 @@ Scope {
     readonly property real screenW: modelData.width
     readonly property real screenH: modelData.height
     property real windowGap: 16                    // space between the bars and tiled windows
-    property real screenMargin: 40                 // min margin from screen edges
     // top bar
     property real barMaxWidth: 720                 // total width of the top bar
-    readonly property real barW: Math.min(barMaxWidth, screenW - screenMargin)
+    readonly property real barW: Math.min(barMaxWidth, screenW)
     readonly property real barX: (screenW - barW) / 2
     // left bar
     property real leftBarMaxLength: 620            // total height of the left bar
-    readonly property real leftLen: Math.min(leftBarMaxLength, screenH - screenMargin)
+    readonly property real leftLen: Math.min(leftBarMaxLength, screenH)
     readonly property real leftY: (screenH - leftLen) / 2
     // bottom / application launcher
     property real launcherX: 190                   // ~5cm from left of screen
     property real topGap: 16                       // space between top bar and tiled windows
+    property real leftGap: 16                      // space between left bar and tiled windows
     property real bottomGap: 18                    // space between bottom of monitor and tiled windows
     property real rightGap: 18                     // space between right of monitor and tiled windows
     property bool appMenuOpen: false
@@ -114,9 +114,10 @@ Scope {
         var parsed = ServiceParsers.parseLayoutConfig(text, scope)
         scope.windowGap = parsed.windowGap
         scope.barMaxWidth = parsed.barMaxWidth
-        scope.screenMargin = parsed.screenMargin
         scope.leftBarMaxLength = parsed.leftBarMaxLength
         scope.launcherX = parsed.launcherX
+        scope.topGap = parsed.topGap
+        scope.leftGap = parsed.leftGap
         scope.bottomGap = parsed.bottomGap
         scope.rightGap = parsed.rightGap
     }
@@ -267,10 +268,10 @@ Scope {
     PanelWindow {
         Component.onCompleted: if (scope.modelData) screen = scope.modelData
         anchors { left: true; top: true; bottom: true }
-        implicitWidth: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.windowGap) : scope.windowGap
+        implicitWidth: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.leftGap) : scope.windowGap
         color: Theme.transparent
         exclusionMode: ExclusionMode.Normal
-        exclusiveZone: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.windowGap) : scope.windowGap
+        exclusiveZone: scope.isLeftmostScreen ? (wsIsland.idleDepth + scope.leftGap) : scope.windowGap
         mask: Region {}
         WlrLayershell.namespace: "qs-leftbar-reserve"
     }
