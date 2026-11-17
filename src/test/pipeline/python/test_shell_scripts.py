@@ -16,6 +16,7 @@ POLL_AUDIO_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "audio" / "poll-audi
 CLAIM_BUS_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "notifications" / "claim-notification-bus.sh"
 STREAM_CAVA_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "audio" / "stream-cava-bars.sh"
 TOGGLE_MENU_SCRIPT = REPO_ROOT / "commands" / "toggle-menu.sh"
+FOCUS_APP_SCRIPT = REPO_ROOT / "src" / "app" / "scripts" / "notifications" / "focus-notification-app.sh"
 
 
 def _write_executable(path: Path, content: str) -> None:
@@ -412,3 +413,102 @@ cat > /dev/null
         check=True,
     )
     assert res_copy.returncode == 0
+
+
+def test_focus_notification_app_sway(tmp_path):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    log_file = tmp_path / "sway_calls.log"
+
+    _write_executable(
+        bin_dir / "swaymsg",
+        f"""#!/usr/bin/env sh
+echo "$*" >> "{log_file}"
+exit 0
+""",
+    )
+
+    env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}:{env.get('PATH', '')}"
+    env["SWAYSOCK"] = "/tmp/sway-test.sock"
+    env.pop("NIRI_SOCKET", None)
+
+    res = subprocess.run(
+        ["sh", str(FOCUS_APP_SCRIPT), "Firefox", "firefox.desktop", "firefox"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert res.returncode == 0
+    calls = log_file.read_text(encoding="utf-8").splitlines()
+    assert len(calls) > 0
+    assert 'app_id="(?i)firefox"' in calls[0]
+
+
+def test_focus_notification_app_niri(tmp_path):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    log_file = tmp_path / "niri_calls.log"
+
+    _write_executable(
+        bin_dir / "niri",
+        f"""#!/usr/bin/env sh
+echo "niri $*" >> "{log_file}"
+if [ "$1" = "msg" ] && [ "$2" = "--json" ] && [ "$3" = "windows" ]; then
+    echo '[{{"id": 42, "app_id": "firefox", "title": "Mozilla Firefox"}}]'
+    exit 0
+fi
+exit 0
+""",
+    )
+
+    env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}:{env.get('PATH', '')}"
+    env["NIRI_SOCKET"] = "/tmp/niri-test.sock"
+    env.pop("SWAYSOCK", None)
+
+    res = subprocess.run(
+        ["sh", str(FOCUS_APP_SCRIPT), "Firefox", "firefox.desktop", "firefox"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert res.returncode == 0
+    calls = log_file.read_text(encoding="utf-8").splitlines()
+    assert any("focus-window --id 42" in c for c in calls)
+
+
+def test_focus_notification_app_no_compositor(tmp_path):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+
+    _write_executable(
+        bin_dir / "swaymsg",
+        """#!/usr/bin/env sh
+exit 1
+""",
+    )
+    _write_executable(
+        bin_dir / "niri",
+        """#!/usr/bin/env sh
+exit 1
+""",
+    )
+
+    env = os.environ.copy()
+    env["PATH"] = f"{bin_dir}:/usr/bin:/bin"
+    env.pop("SWAYSOCK", None)
+    env.pop("NIRI_SOCKET", None)
+    env.pop("XDG_CURRENT_DESKTOP", None)
+    env.pop("XDG_SESSION_DESKTOP", None)
+
+    res = subprocess.run(
+        ["sh", str(FOCUS_APP_SCRIPT), "Firefox", "firefox.desktop", "firefox"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert res.returncode == 0
