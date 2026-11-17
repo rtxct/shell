@@ -99,6 +99,12 @@ def test_app_menu_immediate_focus_and_local_keyboard_exclusivity():
     )
 
 
+def test_app_menu_niri_monitor_focus_switching():
+    bar_content = BAR_QML.read_text(encoding="utf-8")
+    assert "function ensureMenuFocus()" in bar_content
+    assert "niri msg action focus-monitor" in bar_content
+
+
 def test_app_menu_persists_sort_and_starts_selection_at_zero():
     app_menu_content = (REPO_ROOT / "src" / "app" / "modules" / "app-menu.module.qml").read_text(encoding="utf-8")
 

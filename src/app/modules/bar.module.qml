@@ -179,6 +179,27 @@ Scope {
         if (scope.isRightmostScreen && mediaControlBar && mediaControlBar.isMerged) mediaControlBar.closeMerged()
     }
 
+    function ensureMenuFocus() {
+        if (!scope.isLeftmostScreen || !scope.isBottommostScreen) return
+        var outName = (scope.modelData && scope.modelData.name) ? String(scope.modelData.name) : ""
+        focusMonitorProc.command = [
+            "sh", "-c",
+            "if [ -n \"$NIRI_SOCKET\" ] || [ \"$XDG_CURRENT_DESKTOP\" = \"niri\" ]; then if [ -n \"$1\" ]; then niri msg action focus-monitor \"$1\"; else niri msg action focus-monitor-left; fi; fi",
+            "--", outName
+        ]
+        focusMonitorProc.running = true
+    }
+
+    Process {
+        id: focusMonitorProc
+    }
+
+    onAppMenuOpenChanged: {
+        if (scope.appMenuOpen) {
+            scope.ensureMenuFocus()
+        }
+    }
+
     function toggleAppMenu() {
         if (!scope.isLeftmostScreen || !scope.isBottommostScreen) return
         if (scope.appMenuOpen && !appMenu.isClipboardMode) {
@@ -187,6 +208,7 @@ Scope {
             scope.closeAll()
             appMenu.resetSearch()
             scope.appMenuOpen = true
+            scope.ensureMenuFocus()
             appMenu.focusMenu()
         }
     }
@@ -196,6 +218,7 @@ Scope {
         scope.closeAll()
         appMenu.resetSearch()
         scope.appMenuOpen = true
+        scope.ensureMenuFocus()
         appMenu.focusMenu()
     }
 
@@ -213,6 +236,7 @@ Scope {
         } else {
             scope.closeAll()
             scope.appMenuOpen = true
+            scope.ensureMenuFocus()
             appMenu.openWithQuery("\\")
         }
     }
@@ -221,6 +245,7 @@ Scope {
         if (!scope.isLeftmostScreen || !scope.isBottommostScreen) return
         scope.closeAll()
         scope.appMenuOpen = true
+        scope.ensureMenuFocus()
         appMenu.openWithQuery("\\")
     }
 
