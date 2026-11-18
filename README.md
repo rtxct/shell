@@ -7,6 +7,15 @@ The interface stays consistent and fluid, while remaining out of the way when no
 
 https://github.com/user-attachments/assets/c84c8a68-f76d-4cd6-954a-f784688a8d30
 
+<div align="center">
+  <a href="https://buymeacoffee.com/rtxct">
+    <img
+      src="https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-black.svg"
+      alt="Buy Me a Coffee"
+      width="200"
+    />
+  </a>
+</div>
 
 ## What's Inside
 
@@ -145,10 +154,3 @@ Settings live in [`config/`](./config/) as JSON files and **hot-reload on save**
 | [`notifications.config.json`](./config/notifications.config.json) | Popup display timeouts and max visible toast count. |
 | [`layout.config.json`](./config/layout.config.json) | Bar thickness, gaps, margins, and placement coordinates. |
 | [`wallpaper.config.json`](./config/wallpaper.config.json) | Fallback wallpaper path for the screen locker. |
-
-## Buy me a coffee
-<a href="https://buymeacoffee.com/rtxct">
-    <img src="https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-black.svg"
-         alt="Buy Me a Coffee"
-         width="200">
-</a>
