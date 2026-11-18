@@ -11,3 +11,4 @@ WeatherView 1.0 weather-view.component.qml
 PanelPlaceholder 1.0 panel-placeholder.component.qml
 NotificationCard 1.0 notification-card.component.qml
 FloatingWindow 1.0 floating-window.component.qml
+PolkitDialog 1.0 polkit-dialog.component.qml

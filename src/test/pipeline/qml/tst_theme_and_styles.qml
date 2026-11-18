@@ -101,9 +101,10 @@ TestCase {
             [StickNotesBarStyle, "StickNotesBarStyle"],
             [FloatingWindowStyle, "FloatingWindowStyle"],
             [FloatingPanelsStyle, "FloatingPanelsStyle"],
-            [ScreenLockerStyle, "ScreenLockerStyle"]
+            [ScreenLockerStyle, "ScreenLockerStyle"],
+            [PolkitAgentStyle, "PolkitAgentStyle"]
         ]
-        compare(singletons.length, 25)
+        compare(singletons.length, 26)
         for (var i = 0; i < singletons.length; i++) {
             verifyStyleObject(singletons[i][0], singletons[i][1])
         }

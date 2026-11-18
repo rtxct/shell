@@ -34,3 +34,4 @@ StickNotes 1.0 stick-notes-service.module.qml
 Notifications 1.0 notifications-service.module.qml
 HotReload 1.0 hot-reload.module.qml
 ScreenLocker 1.0 screen-locker.module.qml
+PolkitAuth 1.0 polkit-agent.module.qml

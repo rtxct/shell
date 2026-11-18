@@ -100,6 +100,7 @@ ShellRoot {
     StickNotes { id: stickNotesSvc }
     Notifications { id: notificationsSvc }
     ScreenLocker { id: screenLockerSvc }
+    PolkitAuth { id: polkitSvc; workspaces: workspacesSvc }
 
     Variants {
         model: Quickshell.screens

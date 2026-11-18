@@ -470,4 +470,49 @@ QtObject {
     readonly property color screenLockerActionColor: textSecondary
     readonly property color screenLockerActionHoverColor: textBright
     readonly property color screenLockerActionDangerHoverColor: danger
+
+    // -------------------------------------------------------------------------
+    // Group 15: Polkit Authentication Agent (polkit-agent.style.qml)
+    // Controls the centered GNOME-style Polkit modal overlay, glass/solid card,
+    // lock badge, user identity selector pill, password input, and action buttons.
+    // -------------------------------------------------------------------------
+    readonly property color polkitScrimColor: shadowBlack40
+    readonly property color polkitBackground: backgroundPrimary
+    readonly property color polkitBorderColor: borderWhite
+    readonly property color polkitInnerGlowColor: surfaceWhite04
+    readonly property color polkitGlassSheenTop: glassSheenTop
+    readonly property color polkitGlassSheenMid: glassSheenMid
+    readonly property color polkitGlassSheenCore: glassSheenCore
+    readonly property color polkitGlassSheenBottom: glassSheenBottom
+    readonly property color polkitGlassInnerBevel: glassInnerBevel
+    readonly property color polkitGlassRimHighlight: glassRimHighlight
+    readonly property color polkitIconBadgeBg: surfaceWhite08
+    readonly property color polkitIconBadgeBorder: surfaceWhite14
+    readonly property color polkitIconColor: accent
+    readonly property color polkitTitleColor: textBright
+    readonly property color polkitMessageColor: textSecondary
+    readonly property color polkitDetailColor: textSubtle
+    readonly property color polkitIdentityBg: surfaceWhite06
+    readonly property color polkitIdentityHoverBg: surfaceWhite10
+    readonly property color polkitIdentityBorder: surfaceWhite12
+    readonly property color polkitIdentityTextColor: textPrimary
+    readonly property color polkitIdentitySubTextColor: textDim
+    readonly property color polkitInputBg: surfaceWhite08
+    readonly property color polkitInputBorder: surfaceWhite16
+    readonly property color polkitInputBorderFocused: borderWhite
+    readonly property color polkitInputBorderError: danger
+    readonly property color polkitInputTextColor: textBright
+    readonly property color polkitInputPlaceholderColor: textPlaceholder
+    readonly property color polkitErrorColor: danger
+    readonly property color polkitInfoColor: textSecondary
+    readonly property color polkitCancelBtnBg: surfaceWhite08
+    readonly property color polkitCancelBtnHoverBg: surfaceWhite14
+    readonly property color polkitCancelBtnPressedBg: surfaceWhite20
+    readonly property color polkitCancelBtnBorder: surfaceWhite12
+    readonly property color polkitCancelBtnText: textPrimary
+    readonly property color polkitAuthBtnBg: accent
+    readonly property color polkitAuthBtnHoverBg: textBright
+    readonly property color polkitAuthBtnDisabledBg: surfaceWhite08
+    readonly property color polkitAuthBtnText: textOnAccent
+    readonly property color polkitAuthBtnDisabledText: textMuted
 }

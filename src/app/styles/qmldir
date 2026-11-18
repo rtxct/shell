@@ -23,3 +23,4 @@ singleton StickNotesBarStyle 1.0 stick-notes-bar.style.qml
 singleton FloatingWindowStyle 1.0 floating-window.style.qml
 singleton FloatingPanelsStyle 1.0 floating-panels.style.qml
 singleton ScreenLockerStyle 1.0 screen-locker.style.qml
+singleton PolkitAgentStyle 1.0 polkit-agent.style.qml

@@ -20,6 +20,7 @@ Scope {
     property var screenWallpapers: ({})
     readonly property string userName: Quickshell.env("USER") || ""
     property bool authError: false
+    property bool isAuthenticating: false
     property real contentOpacity: 0.0
     property string passwordText: ""
 
@@ -66,6 +67,7 @@ Scope {
     function lock(): void {
         queryWallpaperProc.running = true
         root.authError = false
+        root.isAuthenticating = false
         root.passwordText = ""
         root.contentOpacity = 0.0
         root.isLocked = true
@@ -75,6 +77,7 @@ Scope {
 
     function unlock(): void {
         root.authError = false
+        root.isAuthenticating = false
         root.passwordText = ""
         if (root.contentOpacity > 0.05) {
             fadeOutAnim.start()
@@ -95,10 +98,13 @@ Scope {
     }
 
     function submitPassword(pwd: string): void {
+        if (root.isAuthenticating || pwd.length === 0) return
         if (pam.responseRequired) {
+            root.authError = false
+            root.isAuthenticating = true
+            root.passwordText = ""
             pam.respond(pwd)
         }
-        root.passwordText = ""
     }
 
     function formatLockDate(date: date): string {
@@ -157,6 +163,7 @@ Scope {
         id: pam
         config: "swaylock"
         onCompleted: (result) => {
+            root.isAuthenticating = false
             if (result === PamResult.Success) {
                 root.unlock()
             } else {
@@ -167,10 +174,16 @@ Scope {
             }
         }
         onError: (_err) => {
+            root.isAuthenticating = false
             root.authError = true
             root.passwordText = ""
             authErrorTimer.restart()
             pam.start()
+        }
+        onResponseRequiredChanged: {
+            if (pam.responseRequired && root.isAuthenticating) {
+                root.isAuthenticating = false
+            }
         }
     }
 
@@ -264,6 +277,8 @@ Scope {
                     Item {
                         width: parent.width
                         height: 42
+                        opacity: root.isAuthenticating ? 0.55 : 1.0
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
 
                         TextInput {
                             id: pwdInput
@@ -275,6 +290,7 @@ Scope {
                             verticalAlignment: TextInput.AlignVCenter
                             horizontalAlignment: TextInput.AlignRight
                             focus: true
+                            enabled: !root.isAuthenticating
                             text: root.passwordText
 
                             onTextEdited: {
@@ -290,12 +306,17 @@ Scope {
                                         pwdInput.forceActiveFocus()
                                     }
                                 }
+                                function onIsAuthenticatingChanged() {
+                                    if (!root.isAuthenticating && root.isLocked) {
+                                        pwdInput.forceActiveFocus()
+                                    }
+                                }
                             }
 
                             Text {
                                 anchors.fill: parent
-                                text: root.authError ? "incorrect password" : "password"
-                                color: root.authError ? ScreenLockerStyle.inputBorderError : ScreenLockerStyle.placeholderColor
+                                text: root.isAuthenticating ? "verifying..." : (root.authError ? "incorrect password" : "password")
+                                color: (!root.isAuthenticating && root.authError) ? ScreenLockerStyle.inputBorderError : ScreenLockerStyle.placeholderColor
                                 font.pixelSize: 16
                                 font.italic: true
                                 verticalAlignment: Text.AlignVCenter
@@ -304,7 +325,7 @@ Scope {
                             }
 
                             onAccepted: {
-                                if (root.passwordText.length > 0) {
+                                if (root.passwordText.length > 0 && !root.isAuthenticating) {
                                     root.submitPassword(root.passwordText)
                                 }
                             }
@@ -314,8 +335,8 @@ Scope {
                             anchors.bottom: parent.bottom
                             anchors.left: parent.left
                             anchors.right: parent.right
-                            height: root.authError ? 2 : (pwdInput.activeFocus ? 2 : 1)
-                            color: root.authError ? ScreenLockerStyle.inputBorderError : (pwdInput.activeFocus ? ScreenLockerStyle.inputBorderFocused : ScreenLockerStyle.inputBorder)
+                            height: (!root.isAuthenticating && root.authError) ? 2 : (pwdInput.activeFocus ? 2 : 1)
+                            color: (!root.isAuthenticating && root.authError) ? ScreenLockerStyle.inputBorderError : (pwdInput.activeFocus ? ScreenLockerStyle.inputBorderFocused : ScreenLockerStyle.inputBorder)
 
                             Behavior on color { ColorAnimation { duration: 150 } }
                             Behavior on height { NumberAnimation { duration: 150 } }
